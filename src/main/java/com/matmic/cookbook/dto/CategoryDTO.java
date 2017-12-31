@@ -7,10 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommentDTO {
+public class CategoryDTO {
 
     private Long id;
-    private String comment;
-    private UserDTO user;
-    private RecipeDTO recipe;
+    private String name;
 }

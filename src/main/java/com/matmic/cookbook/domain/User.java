@@ -1,12 +1,18 @@
 package com.matmic.cookbook.domain;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -17,14 +23,15 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     private String password;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Recipe> recipes = new HashSet<>();
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Rating> ratings = new HashSet<>();
 }
