@@ -1,5 +1,8 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.domain.Category;
+import com.matmic.cookbook.domain.Recipe;
+import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.RecipeDTO;
 import com.matmic.cookbook.mapper.RecipeMapper;
 import com.matmic.cookbook.repository.RecipeRepository;
@@ -9,7 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,41 +39,76 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public RecipeDTO findRecipeById(Long id) {
+        Optional<Recipe> optional = recipeRepository.findById(id);
+        if(optional.isPresent()){
+            return recipeMapper.recipeToRecipeDto(optional.get());
+        }
         return null;
     }
 
     @Override
     public List<RecipeDTO> findRecipeByUser(String username) {
-        return null;
+        return recipeRepository.findAll().stream()
+                .filter(recipe -> recipe.getUser().getName().equals(username))
+                .map(recipeMapper::recipeToRecipeDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<RecipeDTO> findRecipeByCategory(String categoryName) {
-        return null;
+    public List<RecipeDTO> findRecipeByCategory(Category category) {
+        List<RecipeDTO> recipes = new ArrayList<>();
+
+        recipeRepository.findAll().forEach(recipe -> {
+            if (recipe.getCategories().contains(category)){
+                recipes.add(recipeMapper.recipeToRecipeDto(recipe));
+            }
+        });
+
+        return recipes;
     }
 
     @Override
-    public List<RecipeDTO> findRecipeByRatingValue(double low, double high) {
-        return null;
+    public List<RecipeDTO> findRecipeByRatingValue(int low, int high) {
+        return recipeRepository.findAll().stream()
+                .filter(recipe -> recipe.getRating().getTotalRating() >= low && recipe.getRating().getTotalRating() <= high)
+                .map(recipeMapper::recipeToRecipeDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<RecipeDTO> findRecipeByRatingAboveValue(double aboveValue) {
-        return null;
+    public List<RecipeDTO> findRecipeByRatingAboveValue(int aboveValue) {
+        return recipeRepository.findAll().stream()
+                .filter(recipe -> recipe.getRating().getTotalRating() >= aboveValue)
+                .map(recipeMapper::recipeToRecipeDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<RecipeDTO> findRecipeByRatingBelowValue(double belowValue) {
-        return null;
+    public List<RecipeDTO> findRecipeByRatingBelowValue(int belowValue) {
+        return recipeRepository.findAll().stream()
+                .filter(recipe -> recipe.getRating().getTotalRating() <= belowValue)
+                .map(recipeMapper::recipeToRecipeDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public RecipeDTO saveOrUpdateRecipe(RecipeDTO recipeDTO) {
-        return null;
+        Recipe detachedRecipe = recipeMapper.recipeDtoToRecipe(recipeDTO);
+
+        Recipe savedRecipe = recipeRepository.save(detachedRecipe);
+        return recipeMapper.recipeToRecipeDto(savedRecipe);
     }
 
     @Override
     public void deleteRecipe(Long id) {
+        Optional<Recipe> optional = recipeRepository.findById(id);
 
+        if (optional.isPresent()){
+            Recipe recipe = optional.get();
+            User user = recipe.getUser();
+            user.getRecipes().remove(recipe);
+            recipe.setUser(null);
+            recipeRepository.delete(recipe);
+        }
     }
 }

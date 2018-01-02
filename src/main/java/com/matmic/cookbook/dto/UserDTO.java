@@ -17,5 +17,5 @@ public class UserDTO {
     private String password;
     private Set<RecipeDTO> recipes;
     private Set<CommentDTO> comments;
-    private Set<RatingDTO> ratings;
+    private Set<EvaluationDTO> evaluations;
 }

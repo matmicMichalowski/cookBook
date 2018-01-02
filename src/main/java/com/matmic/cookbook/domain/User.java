@@ -30,8 +30,10 @@ public class User {
     private Set<Recipe> recipes = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "recipe_comments", joinColumns = @JoinColumn(name="recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    private Set<Rating> ratings = new HashSet<>();
+    private Set<Evaluation> evaluations = new HashSet<>();
 }

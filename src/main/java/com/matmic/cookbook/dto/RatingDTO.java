@@ -12,7 +12,8 @@ import java.util.Set;
 public class RatingDTO {
 
     private Long id;
-    private double value;
-    private Set<UserDTO> usersRatings;
+    private int evaluationSum;
+    private double totalRating;
+    private Set<EvaluationDTO> usersEvaluations;
     private RecipeDTO recipe;
 }

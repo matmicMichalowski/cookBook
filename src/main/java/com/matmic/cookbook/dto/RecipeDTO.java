@@ -21,6 +21,7 @@ public class RecipeDTO {
     private String directions;
     private UserDTO user;
     private Set<CategoryDTO> categories;
+    private Set<CommentDTO> comments;
     private Set<IngredientDTO> ingredients;
 
 }

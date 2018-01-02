@@ -18,10 +18,12 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private double value;
+    private int evaluationSum;
+
+    private double totalRating;
 
     @OneToMany
-    private Set<User> usersRatings = new HashSet<>();
+    private Set<Evaluation> usersEvaluations = new HashSet<>();
 
     @OneToOne
     private Recipe recipe;

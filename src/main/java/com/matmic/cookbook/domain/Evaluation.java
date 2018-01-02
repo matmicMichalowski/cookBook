@@ -1,29 +1,30 @@
 package com.matmic.cookbook.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
-@Entity
-@Getter
+
 @Setter
+@Getter
 @NoArgsConstructor
-public class Ingredient {
+@AllArgsConstructor
+@Entity
+public class Evaluation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    @OneToOne
-    private UnitOfMeasure unitOfMeasure;
-
-    private int amount;
+    @ManyToOne
+    private User user;
+    private int score;
+    private Recipe recipe;
 
     @ManyToOne
-    private Recipe recipe;
+    private Rating recipeRating;
 
 }
