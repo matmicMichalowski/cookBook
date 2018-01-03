@@ -22,9 +22,8 @@ public class Evaluation {
     @ManyToOne
     private User user;
     private int score;
-    private Recipe recipe;
 
     @ManyToOne
-    private Rating recipeRating;
+    private Rating rating;
 
 }

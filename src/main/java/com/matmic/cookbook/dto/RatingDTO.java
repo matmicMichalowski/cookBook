@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -14,6 +15,6 @@ public class RatingDTO {
     private Long id;
     private int evaluationSum;
     private double totalRating;
-    private Set<EvaluationDTO> usersEvaluations;
-    private RecipeDTO recipe;
+    private Set<EvaluationDTO> usersEvaluations = new HashSet<>();
+    private Long recipeId;
 }

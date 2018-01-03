@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -15,7 +16,7 @@ public class UserDTO {
     private String name;
     private String email;
     private String password;
-    private Set<RecipeDTO> recipes;
-    private Set<CommentDTO> comments;
-    private Set<EvaluationDTO> evaluations;
+    private Set<RecipeDTO> recipes = new HashSet<>();
+    private Set<CommentDTO> comments = new HashSet<>();
+    private Set<EvaluationDTO> evaluations = new HashSet<>();
 }

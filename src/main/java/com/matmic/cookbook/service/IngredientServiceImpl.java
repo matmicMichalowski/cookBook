@@ -1,9 +1,10 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.converter.IngredientDtoToIngredient;
+import com.matmic.cookbook.converter.IngredientToIngredientDto;
 import com.matmic.cookbook.domain.Ingredient;
 import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.dto.IngredientDTO;
-import com.matmic.cookbook.mapper.IngredientMapper;
 import com.matmic.cookbook.repository.RecipeRepository;
 import com.matmic.cookbook.repository.UnitOfMeasureRepository;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,14 @@ public class IngredientServiceImpl implements IngredientService {
 
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
-    private final IngredientMapper ingredientMapper;
+    private final IngredientDtoToIngredient toIngredient;
+    private final IngredientToIngredientDto toIngredientDto;
 
-    public IngredientServiceImpl(RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository, IngredientMapper ingredientMapper) {
+    public IngredientServiceImpl(RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository, IngredientDtoToIngredient toIngredient, IngredientToIngredientDto toIngredientDto) {
         this.recipeRepository = recipeRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
-        this.ingredientMapper = ingredientMapper;
+        this.toIngredient = toIngredient;
+        this.toIngredientDto = toIngredientDto;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class IngredientServiceImpl implements IngredientService {
 
         Optional<IngredientDTO> filterIngredient = recipe.getIngredients().stream()
                 .filter(ingredient -> ingredient.getId().equals(ingredientId))
-                .map(ingredient -> ingredientMapper.ingredientToIngredientDto(ingredient)).findFirst();
+                .map(toIngredientDto::convert).findFirst();
 
         if (!filterIngredient.isPresent()){
             return null;
@@ -47,7 +50,7 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Override
     public IngredientDTO saveOrUpdateIngredient(IngredientDTO ingredientDTO) {
-        Optional<Recipe> optional = recipeRepository.findById(ingredientDTO.getRecipe().getId());
+        Optional<Recipe> optional = recipeRepository.findById(ingredientDTO.getRecipeId());
 
         if(!optional.isPresent()){
             return new IngredientDTO();
@@ -65,7 +68,7 @@ public class IngredientServiceImpl implements IngredientService {
                 toUpdate.setUnitOfMeasure(unitOfMeasureRepository.findById(ingredientDTO.getUnitOfMeasure().getId())
                 .orElseThrow(()-> new RuntimeException("Unit not found")));
             }else{
-                Ingredient newIngredient = ingredientMapper.ingredientDtoToIngredient(ingredientDTO);
+                Ingredient newIngredient = toIngredient.convert(ingredientDTO);
                 newIngredient.setRecipe(recipe);
                 recipe.getIngredients().add(newIngredient);
             }
@@ -84,7 +87,7 @@ public class IngredientServiceImpl implements IngredientService {
                         .findFirst();
             }
 
-            return ingredientMapper.ingredientToIngredientDto(savedIngredient.get());
+            return toIngredientDto.convert(savedIngredient.get());
         }
     }
 

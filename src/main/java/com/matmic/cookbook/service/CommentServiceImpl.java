@@ -1,8 +1,9 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.converter.CommentDtoToComment;
+import com.matmic.cookbook.converter.CommentToCommentDto;
 import com.matmic.cookbook.domain.Comment;
 import com.matmic.cookbook.dto.CommentDTO;
-import com.matmic.cookbook.mapper.CommentMapper;
 import com.matmic.cookbook.repository.CommentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +18,14 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final CommentMapper commentMapper;
+    private final CommentToCommentDto toCommentDto;
+    private final CommentDtoToComment toComment;
 
-    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper commentMapper) {
+    public CommentServiceImpl(CommentRepository commentRepository, CommentToCommentDto toCommentDto, CommentDtoToComment toComment) {
         this.commentRepository = commentRepository;
-        this.commentMapper = commentMapper;
+
+        this.toCommentDto = toCommentDto;
+        this.toComment = toComment;
     }
 
 
@@ -29,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentDTO> getAllComments() {
         List<CommentDTO> comments = new ArrayList<>();
         commentRepository.findAll().forEach(comment -> {
-            comments.add(commentMapper.commentToCommentDto(comment));
+            comments.add(toCommentDto.convert(comment));
         });
         return comments;
     }
@@ -38,7 +42,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDTO findCommentById(Long id) {
         Optional<Comment> optional = commentRepository.findById(id);
         if(optional.isPresent()){
-            return commentMapper.commentToCommentDto(optional.get());
+            return toCommentDto.convert(optional.get());
         }
         return null;
     }
@@ -47,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentDTO> findCommentsByUser(Long userId) {
         return  commentRepository.findCommentsByUserId(userId)
                 .stream()
-                .map(commentMapper::commentToCommentDto)
+                .map(toCommentDto::convert)
                 .collect(Collectors.toList());
     }
 
@@ -55,15 +59,15 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentDTO> findCommentByRecipe(Long recipeId) {
         return commentRepository.findCommentsByRecipeId(recipeId)
                 .stream()
-                .map(commentMapper::commentToCommentDto)
+                .map(toCommentDto::convert)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CommentDTO saveOrUpdateComment(CommentDTO commentDTO) {
-        Comment commentToSave = commentMapper.commentDtoToComment(commentDTO);
+        Comment commentToSave = toComment.convert(commentDTO);
         commentRepository.save(commentToSave);
-        return commentMapper.commentToCommentDto(commentToSave);
+        return toCommentDto.convert(commentToSave);
     }
 
     @Override

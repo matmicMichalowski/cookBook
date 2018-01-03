@@ -1,12 +1,12 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.converter.RecipeDtoToRecipe;
+import com.matmic.cookbook.converter.RecipeToRecipeDto;
 import com.matmic.cookbook.domain.Category;
 import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.RecipeDTO;
-import com.matmic.cookbook.mapper.RecipeMapper;
 import com.matmic.cookbook.repository.RecipeRepository;
-import com.matmic.cookbook.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,26 +22,27 @@ import java.util.stream.Collectors;
 public class RecipeServiceImpl implements RecipeService {
 
     private final RecipeRepository recipeRepository;
-    private final RecipeMapper recipeMapper;
-    private final UserRepository userRepository;
+    private final RecipeToRecipeDto toRecipeDto;
+    private final RecipeDtoToRecipe toRecipe;
 
-    public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeMapper recipeMapper, UserRepository userRepository) {
+
+    public RecipeServiceImpl(RecipeRepository recipeRepository,RecipeToRecipeDto toRecipeDto, RecipeDtoToRecipe toRecipe) {
         this.recipeRepository = recipeRepository;
-        this.recipeMapper = recipeMapper;
-        this.userRepository = userRepository;
+        this.toRecipeDto = toRecipeDto;
+        this.toRecipe = toRecipe;
     }
 
 
     @Override
     public Page<RecipeDTO> allRecipes(Pageable pageable) {
-        return recipeRepository.findAll(pageable).map(recipeMapper::recipeToRecipeDto);
+        return recipeRepository.findAll(pageable).map(toRecipeDto::convert);
     }
 
     @Override
     public RecipeDTO findRecipeById(Long id) {
         Optional<Recipe> optional = recipeRepository.findById(id);
         if(optional.isPresent()){
-            return recipeMapper.recipeToRecipeDto(optional.get());
+            return toRecipeDto.convert(optional.get());
         }
         return null;
     }
@@ -50,7 +51,7 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeDTO> findRecipeByUser(String username) {
         return recipeRepository.findAll().stream()
                 .filter(recipe -> recipe.getUser().getName().equals(username))
-                .map(recipeMapper::recipeToRecipeDto)
+                .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
     }
 
@@ -60,7 +61,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         recipeRepository.findAll().forEach(recipe -> {
             if (recipe.getCategories().contains(category)){
-                recipes.add(recipeMapper.recipeToRecipeDto(recipe));
+                recipes.add(toRecipeDto.convert(recipe));
             }
         });
 
@@ -71,7 +72,7 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeDTO> findRecipeByRatingValue(int low, int high) {
         return recipeRepository.findAll().stream()
                 .filter(recipe -> recipe.getRating().getTotalRating() >= low && recipe.getRating().getTotalRating() <= high)
-                .map(recipeMapper::recipeToRecipeDto)
+                .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
     }
 
@@ -79,7 +80,7 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeDTO> findRecipeByRatingAboveValue(int aboveValue) {
         return recipeRepository.findAll().stream()
                 .filter(recipe -> recipe.getRating().getTotalRating() >= aboveValue)
-                .map(recipeMapper::recipeToRecipeDto)
+                .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
     }
 
@@ -87,16 +88,16 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeDTO> findRecipeByRatingBelowValue(int belowValue) {
         return recipeRepository.findAll().stream()
                 .filter(recipe -> recipe.getRating().getTotalRating() <= belowValue)
-                .map(recipeMapper::recipeToRecipeDto)
+                .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
     }
 
     @Override
     public RecipeDTO saveOrUpdateRecipe(RecipeDTO recipeDTO) {
-        Recipe detachedRecipe = recipeMapper.recipeDtoToRecipe(recipeDTO);
+        Recipe detachedRecipe = toRecipe.convert(recipeDTO);
 
         Recipe savedRecipe = recipeRepository.save(detachedRecipe);
-        return recipeMapper.recipeToRecipeDto(savedRecipe);
+        return toRecipeDto.convert(savedRecipe);
     }
 
     @Override

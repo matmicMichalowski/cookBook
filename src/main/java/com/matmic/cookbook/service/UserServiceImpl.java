@@ -1,9 +1,10 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.converter.UserDtoToUser;
+import com.matmic.cookbook.converter.UserToUserDto;
 import com.matmic.cookbook.domain.Evaluation;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.UserDTO;
-import com.matmic.cookbook.mapper.UserMapper;
 import com.matmic.cookbook.repository.EvaluationRepository;
 import com.matmic.cookbook.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,14 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final EvaluationRepository evaluationRepository;
+    private final UserToUserDto toUserDto;
+    private final UserDtoToUser toUser;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, EvaluationRepository evaluationRepository) {
+    public UserServiceImpl(UserRepository userRepository, EvaluationRepository evaluationRepository, UserToUserDto toUserDto, UserDtoToUser toUser) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
+        this.toUserDto = toUserDto;
+        this.toUser = toUser;
         this.evaluationRepository = evaluationRepository;
     }
 
@@ -37,19 +40,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO saveUser(UserDTO userDTO) {
-        User detachedUser = userMapper.userDtoToUser(userDTO);
+        User detachedUser = toUser.convert(userDTO);
 
         User savedUser = userRepository.save(detachedUser);
 
-        return userMapper.userToUserDto(savedUser);
+        return toUserDto.convert(savedUser);
     }
 
     @Override
-    public UserDTO findUserByID(Long id) {
+    public UserDTO findUserDTOByID(Long id) {
         Optional<User> optional = userRepository.findById(id);
 
         if(optional.isPresent()){
-            return userMapper.userToUserDto(optional.get());
+            return toUserDto.convert(optional.get());
         }
 
         return null;
@@ -60,14 +63,24 @@ public class UserServiceImpl implements UserService {
         Optional<User> optional = userRepository.findUserByName(username);
 
         if (optional.isPresent()){
-            return userMapper.userToUserDto(optional.get());
+            return toUserDto.convert(optional.get());
+        }
+        return null;
+    }
+
+
+    @Override
+    public User findUserByID(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()){
+            return user.get();
         }
         return null;
     }
 
     @Override
     public void deleteUser(Long id) {
-        User userToDelete = userMapper.userDtoToUser(findUserByID(id));
+        User userToDelete = findUserByID(id);
 
         userRepository.delete(userToDelete);
     }

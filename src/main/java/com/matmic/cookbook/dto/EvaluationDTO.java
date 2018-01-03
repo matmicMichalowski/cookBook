@@ -10,8 +10,8 @@ import lombok.Setter;
 public class EvaluationDTO {
 
     private Long id;
-    private UserDTO user;
+    private Long userId;
     private int score;
-    private RecipeDTO recipe;
-    private RatingDTO recipeRating;
+    private Long ratingId;
+
 }

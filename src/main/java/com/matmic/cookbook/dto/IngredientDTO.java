@@ -12,5 +12,5 @@ public class IngredientDTO {
     private String name;
     private UnitOfMeasureDTO unitOfMeasure;
     private int amount;
-    private RecipeDTO recipe;
+    private Long recipeId;
 }
