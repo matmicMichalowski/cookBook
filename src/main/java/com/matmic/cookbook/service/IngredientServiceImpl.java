@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,6 +29,33 @@ public class IngredientServiceImpl implements IngredientService {
         this.toIngredient = toIngredient;
         this.toIngredientDto = toIngredientDto;
     }
+
+    @Override
+    public Set<IngredientDTO> getAllIngredientsFromRecipe(Long recipeId){
+        Optional<Recipe> recipeOptional =  recipeRepository.findById(recipeId);
+        if (recipeOptional.isPresent()){
+            Recipe recipeFound = recipeOptional.get();
+            return recipeFound.getIngredients().stream()
+                    .map(toIngredientDto::convert)
+                    .collect(Collectors.toSet());
+        }
+        return null;
+    }
+
+    @Override
+    public IngredientDTO findByRecipeIdAndIngredientId(Long recipeId, Long id){
+        Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
+        if (recipeOptional.isPresent()){
+            Recipe recipeFound = recipeOptional.get();
+            return recipeFound.getIngredients().stream()
+                    .filter(ingredient -> ingredient.getId().equals(id))
+                    .findFirst()
+                    .map(toIngredientDto::convert)
+                    .orElseThrow(RuntimeException::new);
+        }
+        return null;
+    }
+
 
     @Override
     public IngredientDTO getIngredientFromRecipe(Long recipeId, Long ingredientId) {
@@ -49,8 +78,8 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public IngredientDTO saveOrUpdateIngredient(IngredientDTO ingredientDTO) {
-        Optional<Recipe> optional = recipeRepository.findById(ingredientDTO.getRecipeId());
+    public IngredientDTO saveOrUpdateIngredient(IngredientDTO ingredientDTO, Long recipeId) {
+        Optional<Recipe> optional = recipeRepository.findById(recipeId);
 
         if(!optional.isPresent()){
             return new IngredientDTO();

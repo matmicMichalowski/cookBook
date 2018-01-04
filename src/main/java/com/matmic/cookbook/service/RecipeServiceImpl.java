@@ -68,6 +68,7 @@ public class RecipeServiceImpl implements RecipeService {
         return recipes;
     }
 
+
     @Override
     public List<RecipeDTO> findRecipeByRatingValue(int low, int high) {
         return recipeRepository.findAll().stream()

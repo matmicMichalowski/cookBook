@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -63,6 +64,11 @@ public class RatingServiceImpl implements RatingService {
         Rating savedRating = ratingRepository.save(ratingToSave);
 
         return toRatingDto.convert(savedRating);
+    }
+
+    @Override
+    public Set<EvaluationDTO> findRatingEvaluations(Long ratingId){
+        return findRatingByRecipe(ratingId).getUsersEvaluations();
     }
 
 
