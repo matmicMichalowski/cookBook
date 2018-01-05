@@ -24,7 +24,7 @@ public class IngredientController {
         this.ingredientService = ingredientService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/{recipeId}")
     public ResponseEntity<IngredientDTO> getIngredient(@PathVariable Long recipeId, @PathVariable Long id){
         return new ResponseEntity<>(ingredientService.findByRecipeIdAndIngredientId(recipeId, id), HttpStatus.OK);
     }

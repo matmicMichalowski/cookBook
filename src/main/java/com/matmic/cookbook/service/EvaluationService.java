@@ -11,6 +11,6 @@ public interface EvaluationService {
     List<EvaluationDTO> getEvaluations();
     EvaluationDTO findEvaluationById(Long evaluationId);
     EvaluationDTO saveEvaluation(EvaluationDTO evaluationDTO);
-    Set<EvaluationDTO> evaluationsByUser(Long userId);
+    List<EvaluationDTO> evaluationsByUser(Long userId);
     Set<EvaluationDTO> evaluationsByRecipeRating(Long ratingId);
 }

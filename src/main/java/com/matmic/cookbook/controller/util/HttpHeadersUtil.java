@@ -2,7 +2,7 @@ package com.matmic.cookbook.controller.util;
 
 import org.springframework.http.HttpHeaders;
 
-public class HttpHeadersUtil {
+public final class HttpHeadersUtil {
 
     private HttpHeadersUtil(){
     }

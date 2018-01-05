@@ -2,7 +2,6 @@ package com.matmic.cookbook.service;
 
 import com.matmic.cookbook.converter.RecipeDtoToRecipe;
 import com.matmic.cookbook.converter.RecipeToRecipeDto;
-import com.matmic.cookbook.domain.Category;
 import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.RecipeDTO;
@@ -34,7 +33,7 @@ public class RecipeServiceImpl implements RecipeService {
 
 
     @Override
-    public Page<RecipeDTO> allRecipes(Pageable pageable) {
+    public Page<RecipeDTO> findAllRecipes(Pageable pageable) {
         return recipeRepository.findAll(pageable).map(toRecipeDto::convert);
     }
 
@@ -47,22 +46,16 @@ public class RecipeServiceImpl implements RecipeService {
         return null;
     }
 
-    @Override
-    public List<RecipeDTO> findRecipeByUser(String username) {
-        return recipeRepository.findAll().stream()
-                .filter(recipe -> recipe.getUser().getName().equals(username))
-                .map(toRecipeDto::convert)
-                .collect(Collectors.toList());
-    }
 
     @Override
-    public List<RecipeDTO> findRecipeByCategory(Category category) {
+    public List<RecipeDTO> findRecipeByCategory(String categoryName) {
         List<RecipeDTO> recipes = new ArrayList<>();
-
         recipeRepository.findAll().forEach(recipe -> {
-            if (recipe.getCategories().contains(category)){
-                recipes.add(toRecipeDto.convert(recipe));
-            }
+            recipe.getCategories().forEach(category -> {
+                if (category.getName().equals(categoryName)){
+                    recipes.add(toRecipeDto.convert(recipe));
+                }
+            });
         });
 
         return recipes;

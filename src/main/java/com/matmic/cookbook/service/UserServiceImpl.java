@@ -1,11 +1,13 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.converter.EvaluationToEvaluationDto;
+import com.matmic.cookbook.converter.RecipeToRecipeDto;
 import com.matmic.cookbook.converter.UserDtoToUser;
 import com.matmic.cookbook.converter.UserToUserDto;
-import com.matmic.cookbook.domain.Evaluation;
 import com.matmic.cookbook.domain.User;
+import com.matmic.cookbook.dto.EvaluationDTO;
+import com.matmic.cookbook.dto.RecipeDTO;
 import com.matmic.cookbook.dto.UserDTO;
-import com.matmic.cookbook.repository.EvaluationRepository;
 import com.matmic.cookbook.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,22 +21,24 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final EvaluationRepository evaluationRepository;
     private final UserToUserDto toUserDto;
     private final UserDtoToUser toUser;
+    private final RecipeToRecipeDto toRecipeDto;
+    private final EvaluationToEvaluationDto toEvaluationDto;
 
-    public UserServiceImpl(UserRepository userRepository, EvaluationRepository evaluationRepository, UserToUserDto toUserDto, UserDtoToUser toUser) {
+    public UserServiceImpl(UserRepository userRepository, UserToUserDto toUserDto, UserDtoToUser toUser, RecipeToRecipeDto toRecipeDto, EvaluationToEvaluationDto toEvaluationDto) {
         this.userRepository = userRepository;
         this.toUserDto = toUserDto;
         this.toUser = toUser;
-        this.evaluationRepository = evaluationRepository;
+        this.toEvaluationDto = toEvaluationDto;
+        this.toRecipeDto = toRecipeDto;
     }
 
 
     @Override
-    public List<Evaluation> findUserEvaluations(Long userId) {
-        return evaluationRepository.findAll().stream()
-                .filter(evaluation -> evaluation.getUser().getId().equals(userId))
+    public List<EvaluationDTO> findUserEvaluations(Long userId) {
+        return findUserByID(userId).getEvaluations().stream()
+                .map(toEvaluationDto::convert)
                 .collect(Collectors.toList());
     }
 
@@ -56,6 +60,13 @@ public class UserServiceImpl implements UserService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<RecipeDTO> findUserRecipes(Long userId){
+        return findUserByID(userId).getRecipes().stream()
+                .map(toRecipeDto::convert)
+                .collect(Collectors.toList());
     }
 
     @Override

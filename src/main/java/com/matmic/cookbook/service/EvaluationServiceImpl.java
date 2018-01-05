@@ -47,10 +47,9 @@ public class EvaluationServiceImpl implements EvaluationService {
     }
 
     @Override
-    public Set<EvaluationDTO> evaluationsByUser(Long userId) {
-        return userService.findUserEvaluations(userId).stream()
-                .map(toEvaluationDto::convert)
-                .collect(Collectors.toSet());
+    public List<EvaluationDTO> evaluationsByUser(Long userId) {
+        return userService.findUserEvaluations(userId);
+
     }
 
     @Override

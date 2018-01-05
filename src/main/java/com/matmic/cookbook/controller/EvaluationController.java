@@ -34,7 +34,7 @@ public class EvaluationController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Set<EvaluationDTO>> getEvaluationsByUser(@PathVariable Long userId){
+    public ResponseEntity<List<EvaluationDTO>> getEvaluationsByUser(@PathVariable Long userId){
         return new ResponseEntity<>(evaluationService.evaluationsByUser(userId), HttpStatus.OK);
     }
 
