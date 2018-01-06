@@ -33,7 +33,6 @@ public class UserToUserDto implements Converter<User, UserDTO> {
         userDTO.setId(user.getId());
         userDTO.setEmail(user.getEmail());
         userDTO.setName(user.getName());
-        userDTO.setPassword(user.getPassword());
 
         if (user.getComments() != null && user.getComments().size() > 0) {
             user.getComments().forEach(comment -> userDTO.getComments()

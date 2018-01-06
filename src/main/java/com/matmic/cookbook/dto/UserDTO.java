@@ -16,7 +16,6 @@ public class UserDTO {
     private Long id;
     private String name;
     private String email;
-    private String password;
     private boolean isActive = false;
     private Set<Authority> authorities = new HashSet<>();
     private Set<RecipeDTO> recipes = new HashSet<>();

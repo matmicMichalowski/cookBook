@@ -29,7 +29,6 @@ public class UserToUserDtoTest {
         user.setId(ID_VALUE);
         user.setName(NAME);
         user.setEmail(EMAIL);
-        user.setPassword(PASSWORD);
 
         Evaluation evaluation = new Evaluation();
         evaluation.setId(3L);
@@ -54,7 +53,6 @@ public class UserToUserDtoTest {
         assertEquals(ID_VALUE, userDTO.getId());
         assertEquals(NAME, userDTO.getName());
         assertEquals(EMAIL, userDTO.getEmail());
-        assertEquals(PASSWORD, userDTO.getPassword());
         assertEquals(1, userDTO.getEvaluations().size());
         assertEquals(1, userDTO.getComments().size());
         assertEquals(1, userDTO.getRecipes().size());

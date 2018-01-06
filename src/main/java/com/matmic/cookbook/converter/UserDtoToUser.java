@@ -32,7 +32,6 @@ public class UserDtoToUser implements Converter<UserDTO, User>{
         user.setId(userDTO.getId());
         user.setEmail(userDTO.getEmail());
         user.setName(userDTO.getName());
-        user.setPassword(userDTO.getPassword());
 
         if(userDTO.getComments() != null && userDTO.getComments().size() > 0){
             userDTO.getComments().forEach(commentDTO -> user.getComments()
