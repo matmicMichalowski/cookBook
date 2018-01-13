@@ -3,11 +3,13 @@ package com.matmic.cookbook.controller.viewmodel;
 import com.matmic.cookbook.dto.UserDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Getter
+@ToString
 @NoArgsConstructor
 public class UserVM extends UserDTO{
 

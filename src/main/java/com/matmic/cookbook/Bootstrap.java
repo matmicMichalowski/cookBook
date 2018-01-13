@@ -1,14 +1,9 @@
 package com.matmic.cookbook;
 
 import com.matmic.cookbook.converter.CategoryDtoToCategory;
-import com.matmic.cookbook.domain.Category;
-import com.matmic.cookbook.domain.Ingredient;
-import com.matmic.cookbook.domain.Recipe;
-import com.matmic.cookbook.domain.UnitOfMeasure;
+import com.matmic.cookbook.domain.*;
 import com.matmic.cookbook.dto.CategoryDTO;
-import com.matmic.cookbook.repository.IngredientRepository;
-import com.matmic.cookbook.repository.RecipeRepository;
-import com.matmic.cookbook.repository.UnitOfMeasureRepository;
+import com.matmic.cookbook.repository.*;
 import com.matmic.cookbook.service.CategoryService;
 import com.matmic.cookbook.service.IngredientService;
 import org.springframework.context.ApplicationListener;
@@ -25,14 +20,18 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
-    public Bootstrap(CategoryService categoryService, IngredientService ingredientService, CategoryDtoToCategory categoryConverter, RecipeRepository recipeRepository, IngredientRepository ingredientRepository, UnitOfMeasureRepository unitOfMeasureRepository) {
+    public Bootstrap(CategoryService categoryService, IngredientService ingredientService, CategoryDtoToCategory categoryConverter, RecipeRepository recipeRepository, IngredientRepository ingredientRepository, UnitOfMeasureRepository unitOfMeasureRepository, CommentRepository commentRepository, UserRepository userRepository) {
         this.categoryService = categoryService;
         this.ingredientService = ingredientService;
         this.categoryConverter = categoryConverter;
         this.recipeRepository = recipeRepository;
         this.ingredientRepository = ingredientRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
+        this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -47,25 +46,52 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
 
         CategoryDTO found = categoryService.findCategoryByName("Sweet");
 
+
+
+        //commentRepository.save(comment);
+
         Optional<UnitOfMeasure> optional = unitOfMeasureRepository.findById(1L);
         UnitOfMeasure unit = new UnitOfMeasure();
         if (optional.isPresent()){
             unit = optional.get();
         }
 
+        User user = new User();
+        user.setName("UserTest");
+        user.setEmail("mail@test.com");
+        user.setPassword("pass");
+
+
+        userRepository.save(user);
 
         Recipe recipe = new Recipe();
-        recipe.setId(2L);
+        //recipe.setId(2L);
+        Rating rating = new Rating();
+        rating.setRecipe(recipe);
+        recipe.setRating(rating);
+        recipe.setUser(user);
+        user.getRecipes().add(recipe);
 
         Ingredient ingredient = new Ingredient();
-        ingredient.setId(2L);
+        //ingredient.setId(2L);
         ingredient.setUnitOfMeasure(unit);
         ingredient.setRecipe(recipe);
         ingredient.setName("Pepper");
         ingredient.setAmount(1);
 
         recipe.getIngredients().add(ingredient);
+
         recipeRepository.save(recipe);
+
+        Comment comment = new Comment();
+        comment.setUser(user);
+        comment.getUser().getComments().add(comment);
+        comment.setRecipe(recipe);
+        comment.getRecipe().getComments().add(comment);
+        comment.setComment("Test Comment");
+        commentRepository.saveAndFlush(comment);
+
+
 
 
         System.out.println(found.getName());

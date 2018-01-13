@@ -11,9 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.RequestContextListener;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -28,7 +26,7 @@ public class DomainUserDetailsService implements UserDetailsService {
     private final LoginAttemptControlService loginAttemptControlService;
 
 
-    private final HttpServletRequest request;
+    private  HttpServletRequest request;
 
     @Bean
     public RequestContextListener requestContextListener(){
@@ -36,11 +34,10 @@ public class DomainUserDetailsService implements UserDetailsService {
     }
 
 
-    public DomainUserDetailsService(UserRepository userRepository, LoginAttemptControlService loginAttemptControlService) {
+    public DomainUserDetailsService(UserRepository userRepository, LoginAttemptControlService loginAttemptControlService, HttpServletRequest request) {
         this.userRepository = userRepository;
         this.loginAttemptControlService = loginAttemptControlService;
-        this.request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-        .getRequest();
+        this.request = request;
     }
 
 

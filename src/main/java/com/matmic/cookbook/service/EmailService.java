@@ -1,10 +1,7 @@
 package com.matmic.cookbook.service;
 
-import com.matmic.cookbook.domain.User;
+import com.matmic.cookbook.service.mail.Mail;
 
 public interface EmailService {
-    void sendEmail(String to, String subject, String content);
-    void sendEmailFromTemplate(User user, String templateName, String subject);
-    void activationEmail(User user);
-    void passwordResetEmail(User user);
+    void sendEmailMessage(Mail mail);
 }

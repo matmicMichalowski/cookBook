@@ -13,6 +13,7 @@ public interface RecipeService {
     List<RecipeDTO> findRecipeByRatingValue(int low, int high);
     List<RecipeDTO> findRecipeByRatingAboveValue(int aboveValue);
     List<RecipeDTO> findRecipeByRatingBelowValue(int belowValue);
+    RecipeDTO createNewRecipe(RecipeDTO recipeDTO, Long userId);
     RecipeDTO saveOrUpdateRecipe(RecipeDTO recipeDTO);
     void deleteRecipe(Long id);
 }

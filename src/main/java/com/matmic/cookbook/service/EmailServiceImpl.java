@@ -1,72 +1,66 @@
 package com.matmic.cookbook.service;
 
-import com.matmic.cookbook.domain.User;
+
+import com.matmic.cookbook.service.mail.Mail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.util.Locale;
+import java.nio.charset.StandardCharsets;
 
 
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    private final String EMAIL_FROM = "cookbook.appservice@gmail.com";
-    private final String USER = "User";
-    private final JavaMailSender javaMailSender;
-    private final MessageSource messageSource;
+    private Logger log = LoggerFactory.getLogger(EmailService.class);
+
+    private static final String FROM = "cookbook.appservice@gmail.com";
+
+
+    private final JavaMailSender mailSender;
+
     private final SpringTemplateEngine templateEngine;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender, MessageSource messageSource, @Qualifier("engineForMail") SpringTemplateEngine templateEngine) {
-        this.javaMailSender = javaMailSender;
-        this.messageSource = messageSource;
+    public EmailServiceImpl(JavaMailSender mailSender,@Qualifier("templateEngine") SpringTemplateEngine templateEngine) {
+        this.mailSender = mailSender;
         this.templateEngine = templateEngine;
     }
 
-    @Async
     @Override
-    public void sendEmail(String to, String subject, String content) {
+    public void sendEmailMessage(Mail mail){
 
-        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessage message = mailSender.createMimeMessage();
+
         try{
-            MimeMessageHelper helper = new MimeMessageHelper(message);
-            helper.setTo(to);
-            helper.setFrom(EMAIL_FROM);
-            helper.setSubject(subject);
-            helper.setText(content, true);
-        }catch(MessagingException e){
-            e.getMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message,
+                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+            Context ctx = new Context();
+            ctx.setVariable("from", FROM);
+            ctx.setVariable("to", mail.getMailTo());
+            ctx.setVariable("userName", mail.getRecipientName());
+            ctx.setVariable("subject", mail.getMailSubject());
+            ctx.setVariable("actionLink", mail.getActionLink());
+            String html = templateEngine.process(mail.getMailContent(), ctx);
+
+            helper.setTo(mail.getMailTo());
+            helper.setText(html, true);
+            helper.setSubject(mail.getMailSubject());
+            helper.setFrom(FROM);
+
+            mailSender.send(message);
+            log.debug("Email has been sent to: {}", mail.getMailTo());
+
+        }catch(MessagingException ex){
+            log.warn("Unable to send email {}", ex.getMessage());
         }
     }
 
-    @Async
-    @Override
-    public void sendEmailFromTemplate(User user, String templateName, String subject) {
-        Locale locale = Locale.getDefault();
-        Context ctx = new Context(locale);
-        ctx.setVariable(USER, user);
-        String content = templateEngine.process(templateName, ctx);
-        String emailSubject = messageSource.getMessage(subject, null, locale);
-        sendEmail(user.getEmail(), emailSubject, content);
-    }
-
-    @Async
-    @Override
-    public void activationEmail(User user) {
-        sendEmailFromTemplate(user, "activationEmailTemplate", "emails.activation.title");
-    }
-
-    @Async
-    @Override
-    public void passwordResetEmail(User user) {
-        sendEmailFromTemplate(user, "resetPasswordEmailTemplate", "emails.reset.title");
-
-    }
 }

@@ -2,7 +2,6 @@ package com.matmic.cookbook.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,22 +32,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
-//        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable().headers()
-//        .frameOptions().disable();
+        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable().headers()
+        .frameOptions().disable();
 
-        http.authorizeRequests()
-                .antMatchers("/api/login", "").permitAll()
-                .antMatchers("/api/register").permitAll()
-                .antMatchers("/api/registration").permitAll()
-                .antMatchers("/reset-password").permitAll()
-                .antMatchers("/reset").permitAll()
-                .antMatchers("/400error").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/recipes").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/recipe/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/user").permitAll()
-                .antMatchers("/api/**").authenticated()
-                .and()
-                .formLogin()
-                .loginProcessingUrl("/api/authentication");
+//        http.authorizeRequests()
+//                .antMatchers("/api/login").permitAll()
+//                .antMatchers("/api/ok").permitAll()
+//                .antMatchers("/api/register").permitAll()
+//                .antMatchers("/api/registration").permitAll()
+//                .antMatchers("/reset-password").permitAll()
+//                .antMatchers("/reset").permitAll()
+//                .antMatchers("/400error").permitAll()
+//                .antMatchers(HttpMethod.GET, "/api/recipes").permitAll()
+//                .antMatchers(HttpMethod.GET, "/api/recipe/**").permitAll()
+//                .antMatchers(HttpMethod.POST, "/api/user").permitAll()
+//                .antMatchers("/api/**").authenticated()
+//                .and()
+//                .formLogin()
+//                .loginProcessingUrl("/api/authentication");
     }
 }

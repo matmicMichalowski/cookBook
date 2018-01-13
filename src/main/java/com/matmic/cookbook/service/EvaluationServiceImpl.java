@@ -2,6 +2,7 @@ package com.matmic.cookbook.service;
 
 import com.matmic.cookbook.converter.EvaluationToEvaluationDto;
 import com.matmic.cookbook.dto.EvaluationDTO;
+import com.matmic.cookbook.dto.RatingDTO;
 import com.matmic.cookbook.repository.EvaluationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +43,11 @@ public class EvaluationServiceImpl implements EvaluationService {
 
     @Override
     public EvaluationDTO saveEvaluation(EvaluationDTO evaluationDTO) {
-        ratingService.saveAndUpdateRating(evaluationDTO);
-        return evaluationDTO;
+        RatingDTO rating = ratingService.saveAndUpdateRating(evaluationDTO);
+
+        return rating.getUsersEvaluations().stream()
+                .filter(ev -> ev.getUserId().equals(evaluationDTO.getUserId()))
+                .findFirst().get();
     }
 
     @Override

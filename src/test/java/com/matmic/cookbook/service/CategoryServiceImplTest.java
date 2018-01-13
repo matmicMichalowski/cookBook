@@ -20,23 +20,23 @@ import static org.mockito.Mockito.*;
 
 public class CategoryServiceImplTest {
 
-    @Mock
-    private CategoryDtoToCategory categoryConv;
 
-    @Mock
-    private CategoryToCategoryDto categoryConvDto;
+    private CategoryDtoToCategory toCategory = new CategoryDtoToCategory();
+
+
+    private CategoryToCategoryDto toCategoryDto = new CategoryToCategoryDto();
 
     @Mock
     private CategoryRepository categoryRepository;
 
-    private CategoryService service;
+    private CategoryService categoryService;
 
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        service = new CategoryServiceImpl(categoryRepository, categoryConvDto, categoryConv);
+        categoryService = new CategoryServiceImpl(categoryRepository, toCategoryDto, toCategory);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class CategoryServiceImplTest {
 
         when(categoryRepository.findAll()).thenReturn(categories);
 
-        List<CategoryDTO> categoriesFound = service.findAll();
+        List<CategoryDTO> categoriesFound = categoryService.findAll();
 
         assertNotNull(categoriesFound);
         assertEquals(2, categoriesFound.size());
@@ -65,11 +65,9 @@ public class CategoryServiceImplTest {
         toBeSaved.setId(3L);
         toBeSaved.setName("Spicy");
 
-        when(categoryConv.convert(any())).thenReturn(newCategory);
         when(categoryRepository.save(any())).thenReturn(newCategory);
-        when(categoryConvDto.convert(any())).thenReturn(toBeSaved);
 
-        CategoryDTO savedCategory = service.saveCategory(new CategoryDTO());
+        CategoryDTO savedCategory = categoryService.saveCategory(new CategoryDTO());
 
         assertEquals(Long.valueOf(3L), savedCategory.getId());
         assertNotNull(savedCategory);
@@ -85,18 +83,22 @@ public class CategoryServiceImplTest {
 
         Optional<Category> findByName = Optional.of(category);
 
-
         when(categoryRepository.findCategoryByName(anyString())).thenReturn(findByName);
 
-        CategoryDTO categoryFound = service.findCategoryByName("");
+        CategoryDTO categoryFound = categoryService.findCategoryByName("");
 
-        System.out.println(categoryFound.getName());
 
         assertNotNull(categoryFound);
     }
 
     @Test
     public void deleteCategory() throws Exception {
+        Long toDelete = 2L;
+
+        categoryService.deleteCategory(toDelete);
+
+        verify(categoryRepository, times(1)).deleteById(anyLong());
+        verify(categoryRepository, never()).deleteAll();
     }
 
 }

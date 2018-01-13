@@ -3,10 +3,12 @@ package com.matmic.cookbook.controller;
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
 import com.matmic.cookbook.controller.util.PaginationUtil;
 import com.matmic.cookbook.domain.User;
+import com.matmic.cookbook.dto.RecipeDTO;
 import com.matmic.cookbook.dto.UserDTO;
 import com.matmic.cookbook.repository.UserRepository;
 import com.matmic.cookbook.service.EmailService;
 import com.matmic.cookbook.service.UserService;
+import com.matmic.cookbook.service.mail.Mail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,11 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -40,6 +44,20 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
+    @RequestMapping("/ok")
+    public String mailTest(HttpServletRequest request){
+        String applicationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        User user = new User();
+        user.setEmail("trajanesco@gmail.com");
+        user.setName("newName");
+        user.setActivationToken(UUID.randomUUID().toString());
+
+        Mail mail = new Mail(user.getEmail(), user.getName(), "Testing", "passwordResetEmail",
+                applicationUrl + "/activate?token=" + user.getActivationToken());
+        emailService.sendEmailMessage(mail);
+        return "ok";
+    }
+
     @PostMapping("/user")
     public ResponseEntity createUser(@Valid @RequestBody User user) throws URISyntaxException{
         log.debug("REST request to save new User: {}", user);
@@ -54,7 +72,7 @@ public class UserController {
                     .body(null);
         }else{
             User newUser = userService.createUser(user);
-            emailService.activationEmail(newUser);
+            //emailService.activationEmail(newUser);
             return ResponseEntity.created(new URI("/api/user/" + newUser.getName()))
                     .headers(HttpHeadersUtil.createdEntityAlert(ENTITY_NAME, newUser.getName()))
                     .body(newUser);
@@ -87,7 +105,13 @@ public class UserController {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{login}")
+
+    @GetMapping("/user/recipes")
+    public ResponseEntity<List<RecipeDTO>> findUserRecipes(@RequestParam Long id){
+        return new ResponseEntity<>(userService.findUserRecipes(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable Long id){
         log.debug("REST request to get User: {}", id);
         return ResponseEntity.ok(userService.findUserDTOByID(id));

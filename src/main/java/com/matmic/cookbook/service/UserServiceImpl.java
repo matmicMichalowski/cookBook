@@ -12,20 +12,22 @@ import com.matmic.cookbook.dto.UserDTO;
 import com.matmic.cookbook.repository.AuthorityRepository;
 import com.matmic.cookbook.repository.UserRepository;
 import com.matmic.cookbook.security.SecurityUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
+
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final UserToUserDto toUserDto;
@@ -116,17 +118,37 @@ public class UserServiceImpl implements UserService {
         newUser.setName(user.getName());
         newUser.setActivationToken(UUID.randomUUID().toString());
         userRepository.save(newUser);
-
+        log.debug("Created new user: {}", newUser);
         return newUser;
     }
 
     @Override
+    public User createUser(String name, String email, String password) {
+        User user = new User();
+        Authority authority = authorityRepository.findOneByName("USER");
+        Set<Authority> authorities = new HashSet<>();
+        String encryptedPassword = passwordEncoder.encode(password);
+        user.setName(name);
+        user.setPassword(encryptedPassword);
+        user.setEmail(email);
+        user.setActive(false);
+        authorities.add(authority);
+        user.setAuthorities(authorities);
+        user.setActivationToken(UUID.randomUUID().toString());
+        userRepository.save(user);
+        log.debug("Created new user: {}", user);
+        return user;
+    }
+
+    @Override
     public UserDTO updateUser(UserDTO userDTO) {
-        User detachedUser = toUser.convert(userDTO);
-
-        User savedUser = userRepository.save(detachedUser);
-
-        return toUserDto.convert(savedUser);
+        Optional<User> optional = userRepository.findById(userDTO.getId());
+        if (optional.isPresent()) {
+            User detachedUser = toUser.convert(userDTO);
+            User savedUser = userRepository.save(detachedUser);
+            return toUserDto.convert(savedUser);
+        }
+        return null;
     }
 
     @Override
@@ -136,7 +158,6 @@ public class UserServiceImpl implements UserService {
         if(optional.isPresent()){
             return toUserDto.convert(optional.get());
         }
-
         return null;
     }
 
@@ -160,6 +181,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public User getUserWithAuthorities() {
+        return userRepository.findOneWithAuthoritiesByName(SecurityUtil.getCurrentUser()).orElse(null);
     }
 
 

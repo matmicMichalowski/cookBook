@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{emails.activation.title}">Activation email</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <p th:text="'Greetings ' + ${mailTo}">
+            Dear, User
+        </p>
+        <p>
+            Your CookBook account has been created, please click on the activation link to start cooking:
+        </p>
+        <p>
+            <a th:href="@{${code}}"
+               role="button">Activation Link</a>
+        </p>
+        <p>
+            <span>Regards, </span>
+            <br/>
+            <em>CookBook App Team.</em>
+        </p>
+    </body>
+</html>

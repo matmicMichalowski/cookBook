@@ -48,6 +48,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public CommentDTO findUserCommentById(Long userId, Long commentId){
+        return findCommentsByUser(userId).stream()
+                .filter(comment -> comment.getId().equals(commentId))
+                .findFirst().orElseThrow(RuntimeException::new);
+    }
+
+    @Override
     public List<CommentDTO> findCommentsByUser(Long userId) {
         return  commentRepository.findCommentsByUserId(userId)
                 .stream()
@@ -66,8 +73,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDTO saveOrUpdateComment(CommentDTO commentDTO) {
         Comment commentToSave = toComment.convert(commentDTO);
-        commentRepository.save(commentToSave);
-        return toCommentDto.convert(commentToSave);
+        Comment saved = commentRepository.save(commentToSave);
+        return toCommentDto.convert(saved);
     }
 
     @Override

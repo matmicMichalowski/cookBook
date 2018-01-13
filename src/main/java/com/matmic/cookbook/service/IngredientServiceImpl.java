@@ -56,27 +56,6 @@ public class IngredientServiceImpl implements IngredientService {
         return null;
     }
 
-
-    @Override
-    public IngredientDTO getIngredientFromRecipe(Long recipeId, Long ingredientId) {
-        Optional<Recipe> optional = recipeRepository.findById(recipeId);
-        if(!optional.isPresent()){
-            return null;
-        }
-
-        Recipe recipe = optional.get();
-
-        Optional<IngredientDTO> filterIngredient = recipe.getIngredients().stream()
-                .filter(ingredient -> ingredient.getId().equals(ingredientId))
-                .map(toIngredientDto::convert).findFirst();
-
-        if (!filterIngredient.isPresent()){
-            return null;
-        }
-
-        return filterIngredient.get();
-    }
-
     @Override
     public IngredientDTO saveOrUpdateIngredient(IngredientDTO ingredientDTO, Long recipeId) {
         Optional<Recipe> optional = recipeRepository.findById(recipeId);

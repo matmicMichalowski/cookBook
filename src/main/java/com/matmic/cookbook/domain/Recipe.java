@@ -1,7 +1,6 @@
 package com.matmic.cookbook.domain;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -12,7 +11,6 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 public class Recipe implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -44,4 +42,38 @@ public class Recipe implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Ingredient> ingredients = new HashSet<>();
+
+    public Recipe (){
+        this.setRatingForRecipe();
+    }
+
+    private void setRatingForRecipe(){
+        Rating rating = new Rating();
+
+        rating.setRecipe(this);
+        this.setRating(rating);
+    }
+
+    public void setUser(User user){
+
+        if(sameAsFormerUser(user)){
+            return;
+        }
+
+        User actualUser = this.user;
+        this.user = user;
+
+        if (actualUser != null){
+            actualUser.getRecipes().remove(this);
+        }
+        if (user != null){
+            user.getRecipes().add(this);
+        }
+    }
+
+    private boolean sameAsFormerUser(User newUser){
+        return this.user == null ? newUser == null : this.user.equals(newUser);
+    }
+
+
 }

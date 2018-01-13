@@ -8,6 +8,7 @@ public interface CommentService {
     List<CommentDTO> getAllComments();
     CommentDTO findCommentById(Long id);
     List<CommentDTO> findCommentsByUser(Long userId);
+    CommentDTO findUserCommentById(Long userId, Long commentId);
     List<CommentDTO> findCommentByRecipe(Long recipeId);
     CommentDTO saveOrUpdateComment(CommentDTO commentDTO);
     void deleteComment(Long id);

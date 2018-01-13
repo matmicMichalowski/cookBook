@@ -19,12 +19,14 @@ public interface UserService {
     Optional<User> completeResetPasswordRequest(String newPassword, String resetToken);
     void changePassword(String password);
     User createUser(User user);
+    User createUser(String name, String email, String password);
     UserDTO updateUser(UserDTO userDTO);
     UserDTO findUserDTOByID(Long id);
     User findUserByID(Long id);
     List<RecipeDTO> findUserRecipes(Long userId);
     UserDTO findUserByUsername(String username);
     List<String> getAuthorities();
+    User getUserWithAuthorities();
     void deleteUser(Long id);
 
 }

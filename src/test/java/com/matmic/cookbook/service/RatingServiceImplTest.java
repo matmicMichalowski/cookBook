@@ -10,9 +10,7 @@ import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.EvaluationDTO;
 import com.matmic.cookbook.dto.RatingDTO;
-import com.matmic.cookbook.mapper.RecipeMapper;
 import com.matmic.cookbook.repository.RatingRepository;
-import com.matmic.cookbook.repository.RecipeRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,18 +29,11 @@ public class RatingServiceImplTest {
     @Mock
     private RatingRepository ratingRepository;
 
-    @Mock
-    private RatingToRatingDto ratingConv;
 
-    @Mock
-    private RecipeMapper recipeMapper = RecipeMapper.INSTANCE;
+    private RatingToRatingDto toRatingDto = new RatingToRatingDto(new EvaluationToEvaluationDto());
 
+    private EvaluationDtoToEvaluation toEvaluation = new EvaluationDtoToEvaluation();
 
-    @Mock
-    private RecipeRepository recipeRepository;
-
-    @Mock
-    private EvaluationDtoToEvaluation evaluationConv;
 
     private RatingService ratingService;
 
@@ -51,9 +42,8 @@ public class RatingServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        ratingConv = new RatingToRatingDto(new EvaluationToEvaluationDto());
-        evaluationConv = new EvaluationDtoToEvaluation();
-        ratingService = new RatingServiceImpl(evaluationConv, ratingConv, ratingRepository);
+
+        ratingService = new RatingServiceImpl(toEvaluation, toRatingDto, ratingRepository);
     }
 
     @Test
@@ -125,8 +115,5 @@ public class RatingServiceImplTest {
 
     }
 
-    @Test
-    public void findRatingByRecipe() throws Exception {
-    }
 
 }

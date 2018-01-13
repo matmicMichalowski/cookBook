@@ -2,6 +2,7 @@ package com.matmic.cookbook.service;
 
 import com.matmic.cookbook.converter.RecipeDtoToRecipe;
 import com.matmic.cookbook.converter.RecipeToRecipeDto;
+import com.matmic.cookbook.domain.Rating;
 import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.RecipeDTO;
@@ -23,12 +24,14 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeToRecipeDto toRecipeDto;
     private final RecipeDtoToRecipe toRecipe;
+    private final UserService userService;
 
 
-    public RecipeServiceImpl(RecipeRepository recipeRepository,RecipeToRecipeDto toRecipeDto, RecipeDtoToRecipe toRecipe) {
+    public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeToRecipeDto toRecipeDto, RecipeDtoToRecipe toRecipe, UserService userService) {
         this.recipeRepository = recipeRepository;
         this.toRecipeDto = toRecipeDto;
         this.toRecipe = toRecipe;
+        this.userService = userService;
     }
 
 
@@ -87,11 +90,33 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public RecipeDTO createNewRecipe(RecipeDTO recipeDTO, Long userId){
+        Recipe recipe = toRecipe.convert(recipeDTO);
+        User user = userService.findUserByID(userId);
+        if ( user == null){
+            return null;
+        }
+        recipe.setUser(user);
+        Recipe savedRecipe = recipeRepository.save(recipe);
+
+        return toRecipeDto.convert(savedRecipe);
+    }
+
+    @Override
     public RecipeDTO saveOrUpdateRecipe(RecipeDTO recipeDTO) {
         Recipe detachedRecipe = toRecipe.convert(recipeDTO);
+        Optional<Recipe> optional = recipeRepository.findById(recipeDTO.getId());
 
-        Recipe savedRecipe = recipeRepository.save(detachedRecipe);
-        return toRecipeDto.convert(savedRecipe);
+        if (optional.isPresent()) {
+            Recipe savedRecipe = recipeRepository.save(detachedRecipe);
+            return toRecipeDto.convert(savedRecipe);
+        }
+
+        Rating rating = new Rating();
+        rating.setRecipe(detachedRecipe);
+        detachedRecipe.setRating(rating);
+        recipeRepository.save(detachedRecipe);
+        return toRecipeDto.convert(detachedRecipe);
     }
 
     @Override
