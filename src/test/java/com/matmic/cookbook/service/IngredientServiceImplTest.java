@@ -118,7 +118,7 @@ public class IngredientServiceImplTest {
         when(uomRepository.findById(anyLong())).thenReturn(Optional.of(unitOfMeasure));
         when(recipeRepository.save(any())).thenReturn(recipe);
 
-        IngredientDTO ingredientSaved = ingredientService.saveOrUpdateIngredient(ingredientDTO, 3L);
+        IngredientDTO ingredientSaved = ingredientService.saveOrUpdateIngredient(ingredientDTO);
 
         assertNotNull(ingredientSaved);
 

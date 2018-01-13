@@ -57,8 +57,8 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public IngredientDTO saveOrUpdateIngredient(IngredientDTO ingredientDTO, Long recipeId) {
-        Optional<Recipe> optional = recipeRepository.findById(recipeId);
+    public IngredientDTO saveOrUpdateIngredient(IngredientDTO ingredientDTO) {
+        Optional<Recipe> optional = recipeRepository.findById(ingredientDTO.getRecipeId());
 
         if(!optional.isPresent()){
             return new IngredientDTO();

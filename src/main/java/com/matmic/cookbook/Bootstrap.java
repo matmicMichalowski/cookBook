@@ -68,6 +68,7 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
         //recipe.setId(2L);
         Rating rating = new Rating();
         rating.setRecipe(recipe);
+        rating.setTotalRating(5.0);
         recipe.setRating(rating);
         recipe.setUser(user);
         user.getRecipes().add(recipe);

@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "recipe")
 @Getter
 @Setter
 public class Recipe implements Serializable {
@@ -24,7 +24,7 @@ public class Recipe implements Serializable {
     private int servings;
     private Difficulty difficulty;
 
-    @OneToOne(cascade = CascadeType.ALL)
+//    @OneToOne(mappedBy = "recipe", cascade = CascadeType.ALL)
     private Rating rating;
 
     @Lob
@@ -49,8 +49,6 @@ public class Recipe implements Serializable {
 
     private void setRatingForRecipe(){
         Rating rating = new Rating();
-
-        rating.setRecipe(this);
         this.setRating(rating);
     }
 

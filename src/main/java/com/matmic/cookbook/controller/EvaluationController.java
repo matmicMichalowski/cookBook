@@ -1,17 +1,18 @@
 package com.matmic.cookbook.controller;
 
-import com.matmic.cookbook.controller.util.HttpHeadersUtil;
 import com.matmic.cookbook.dto.EvaluationDTO;
 import com.matmic.cookbook.service.EvaluationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
-@RequestMapping("/api/evaluation")
+@RequestMapping("/api")
 public class EvaluationController {
 
     private static final String ENTITY_NAME = "evaluation";
@@ -22,42 +23,19 @@ public class EvaluationController {
         this.evaluationService = evaluationService;
     }
 
-    @GetMapping
+    @GetMapping("/evaluations")
     public ResponseEntity<List<EvaluationDTO>> getAllEvaluations(){
         return new ResponseEntity<>(evaluationService.getEvaluations(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/evaluation/{id}")
     public ResponseEntity<EvaluationDTO> getEvaluationById(@PathVariable Long id){
         EvaluationDTO evaluationDTO = evaluationService.findEvaluationById(id);
         return new ResponseEntity<>(evaluationDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/evaluation/user/{userId}")
     public ResponseEntity<List<EvaluationDTO>> getEvaluationsByUser(@PathVariable Long userId){
         return new ResponseEntity<>(evaluationService.evaluationsByUser(userId), HttpStatus.OK);
-    }
-
-    @GetMapping("/{recipeRatingId}")
-    public ResponseEntity<Set<EvaluationDTO>> getEvaluationsByRecipeRating(@PathVariable Long recipeRatingId){
-        return new ResponseEntity<>(evaluationService.evaluationsByRecipeRating(recipeRatingId), HttpStatus.OK);
-    }
-
-    @PostMapping("/new")
-    public ResponseEntity<EvaluationDTO> saveNewEvaluation(@RequestBody EvaluationDTO evaluationDTO){
-        if (evaluationDTO.getId() != null){
-            return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "A new evaluation can not be created it already have an Id")).body(null);
-        }
-        EvaluationDTO evaluation = evaluationService.saveEvaluation(evaluationDTO);
-        return ResponseEntity.ok().headers(HttpHeadersUtil.createdEntityAlert(ENTITY_NAME, evaluation.getId().toString())).body(evaluation);
-    }
-
-    @PutMapping("/update")
-    public ResponseEntity<EvaluationDTO> updateEvaluation(@RequestBody EvaluationDTO evaluationDTO){
-        if (evaluationDTO.getId() == null){
-            return saveNewEvaluation(evaluationDTO);
-        }
-        EvaluationDTO evaluation = evaluationService.saveEvaluation(evaluationDTO);
-        return ResponseEntity.ok().headers(HttpHeadersUtil.updateEntityAlert(ENTITY_NAME, evaluation.getId().toString())).body(evaluation);
     }
 }
