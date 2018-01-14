@@ -23,7 +23,6 @@ public class CategoryServiceImplTest {
 
     private CategoryDtoToCategory toCategory = new CategoryDtoToCategory();
 
-
     private CategoryToCategoryDto toCategoryDto = new CategoryToCategoryDto();
 
     @Mock
@@ -42,9 +41,15 @@ public class CategoryServiceImplTest {
     @Test
     public void findAll() throws Exception {
         List<Category> categories = new ArrayList<>();
+        Category cat1 = new Category();
+        cat1.setId(1L);
+        cat1.setName("Mexican");
+        Category cat2 = new Category();
+        cat2.setId(2L);
+        cat2.setName("ameRican");
 
-        categories.add(new Category());
-        categories.add(new Category());
+        categories.add(cat1);
+        categories.add(cat2);
 
         when(categoryRepository.findAll()).thenReturn(categories);
 
@@ -59,15 +64,15 @@ public class CategoryServiceImplTest {
     public void saveCategory() throws Exception {
         Category newCategory = new Category();
         newCategory.setId(3L);
-        newCategory.setName("Spicy");
+        newCategory.setName("spicy");
 
         CategoryDTO toBeSaved = new CategoryDTO();
         toBeSaved.setId(3L);
-        toBeSaved.setName("Spicy");
+        toBeSaved.setName("spicy");
 
         when(categoryRepository.save(any())).thenReturn(newCategory);
 
-        CategoryDTO savedCategory = categoryService.saveCategory(new CategoryDTO());
+        CategoryDTO savedCategory = categoryService.saveCategory(toBeSaved);
 
         assertEquals(Long.valueOf(3L), savedCategory.getId());
         assertNotNull(savedCategory);
@@ -87,8 +92,8 @@ public class CategoryServiceImplTest {
 
         CategoryDTO categoryFound = categoryService.findCategoryByName("");
 
-
         assertNotNull(categoryFound);
+        assertEquals("fast food", categoryFound.getName());
     }
 
     @Test

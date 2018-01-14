@@ -1,5 +1,7 @@
 package com.matmic.cookbook.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,23 +26,30 @@ public class Recipe implements Serializable {
     private int servings;
     private Difficulty difficulty;
 
-//    @OneToOne(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Rating rating;
 
     @Lob
     private String directions;
 
+
     @ManyToOne
+    @JsonIgnore
     private User user;
+
+    private String userName;
 
     @OneToMany
     private Set<Category> categories = new HashSet<>();
 
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<Ingredient> ingredients = new HashSet<>();
 
     public Recipe (){
@@ -49,8 +58,11 @@ public class Recipe implements Serializable {
 
     private void setRatingForRecipe(){
         Rating rating = new Rating();
+
+        rating.setRecipe(this);
         this.setRating(rating);
     }
+
 
     public void setUser(User user){
 
@@ -60,6 +72,7 @@ public class Recipe implements Serializable {
 
         User actualUser = this.user;
         this.user = user;
+
 
         if (actualUser != null){
             actualUser.getRecipes().remove(this);

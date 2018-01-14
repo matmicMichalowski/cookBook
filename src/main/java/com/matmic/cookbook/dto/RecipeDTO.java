@@ -18,6 +18,7 @@ public class RecipeDTO {
     private int cookTime;
     private int servings;
     private Difficulty difficulty;
+    private String userName;
     private RatingDTO rating;
     private String directions;
     private Long userId;

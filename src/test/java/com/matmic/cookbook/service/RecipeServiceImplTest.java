@@ -85,9 +85,11 @@ public class RecipeServiceImplTest {
     @Test
     public void findRecipeByCategory() throws Exception {
         Category cat1 = new Category();
-        cat1.setName("European");
+        cat1.setId(1L);
+        cat1.setName("european");
         Category cat2 = new Category();
-        cat2.setName("American");
+        cat2.setId(2L);
+        cat2.setName("american");
 
         Recipe recipe1 = new Recipe();
         recipe1.setId(5L);
@@ -113,11 +115,11 @@ public class RecipeServiceImplTest {
 
         List<Recipe> recipeList = new ArrayList<>();
         recipeList.add(recipe1);
-        recipeList.add(recipe2);
 
-        when(recipeRepository.findAll()).thenReturn(recipeList);
 
-        List<RecipeDTO> recipeFound = recipeService.findRecipeByCategory("European");
+        when(recipeRepository.findAllByCategoryName(anyString())).thenReturn(recipeList);
+
+        List<RecipeDTO> recipeFound = recipeService.findRecipeByCategory("european");
 
         assertNotNull(recipeFound);
         assertEquals(1, recipeFound.size());
@@ -128,39 +130,25 @@ public class RecipeServiceImplTest {
         Recipe recipe1 = new Recipe();
         recipe1.setId(1L);
         recipe1.setUser(new User());
-        Recipe recipe2 = new Recipe();
-        recipe2.setId(2L);
-        recipe2.setUser(new User());
-        Recipe recipe3 = new Recipe();
-        recipe3.setId(3L);
-        recipe3.setUser(new User());
+
 
         Rating rating1 = new Rating();
         rating1.setTotalRating(4);
         rating1.setRecipe(recipe1);
         recipe1.setRating(rating1);
-        Rating rating2 = new Rating();
-        rating2.setTotalRating(5);
-        rating2.setRecipe(recipe2);
-        recipe2.setRating(rating2);
-        Rating rating3 = new Rating();
-        rating3.setTotalRating(2);
-        rating3.setRecipe(recipe3);
-        recipe3.setRating(rating3);
 
         List<Recipe> allRecipes = new ArrayList<>();
         allRecipes.add(recipe1);
-        allRecipes.add(recipe2);
-        allRecipes.add(recipe3);
 
-        when(recipeRepository.findAll()).thenReturn(allRecipes);
 
-        List<RecipeDTO> byRatingVal = recipeService.findRecipeByRatingValue(1, 4);
+        when(recipeRepository.findAllRecipesBetweenRatingValues(anyInt(), anyInt())).thenReturn(allRecipes);
+
+        List<RecipeDTO> byRatingVal = recipeService.findRecipeByRatingValueBetweenLowAndHigh(1, 4);
 
         assertNotNull(byRatingVal);
-        assertEquals(2, byRatingVal.size());
-        assertEquals(3, allRecipes.size());
-        verify(recipeRepository, times(1)).findAll();
+        assertEquals(1, byRatingVal.size());
+        assertEquals(1, allRecipes.size());
+        verify(recipeRepository, times(1)).findAllRecipesBetweenRatingValues(anyInt(), anyInt());
     }
 
     @Test
@@ -168,39 +156,23 @@ public class RecipeServiceImplTest {
         Recipe recipe1 = new Recipe();
         recipe1.setId(1L);
         recipe1.setUser(new User());
-        Recipe recipe2 = new Recipe();
-        recipe2.setId(2L);
-        recipe2.setUser(new User());
-        Recipe recipe3 = new Recipe();
-        recipe3.setId(3L);
-        recipe3.setUser(new User());
 
         Rating rating1 = new Rating();
         rating1.setTotalRating(4);
         rating1.setRecipe(recipe1);
         recipe1.setRating(rating1);
-        Rating rating2 = new Rating();
-        rating2.setTotalRating(5);
-        rating2.setRecipe(recipe2);
-        recipe2.setRating(rating2);
-        Rating rating3 = new Rating();
-        rating3.setTotalRating(2);
-        rating3.setRecipe(recipe3);
-        recipe3.setRating(rating3);
 
         List<Recipe> allRecipes = new ArrayList<>();
         allRecipes.add(recipe1);
-        allRecipes.add(recipe2);
-        allRecipes.add(recipe3);
 
-        when(recipeRepository.findAll()).thenReturn(allRecipes);
+        when(recipeRepository.findAllRecipesAboveRating(anyInt())).thenReturn(allRecipes);
 
-        List<RecipeDTO> byRatingVal = recipeService.findRecipeByRatingAboveValue(5);
+        List<RecipeDTO> byRatingVal = recipeService.findRecipeByRatingAboveValue(1);
 
         assertNotNull(byRatingVal);
         assertEquals(1, byRatingVal.size());
-        assertEquals(3, allRecipes.size());
-        verify(recipeRepository, times(1)).findAll();
+        assertEquals(1, allRecipes.size());
+        verify(recipeRepository, times(1)).findAllRecipesAboveRating(anyInt());
     }
 
     @Test
@@ -208,39 +180,23 @@ public class RecipeServiceImplTest {
         Recipe recipe1 = new Recipe();
         recipe1.setId(1L);
         recipe1.setUser(new User());
-        Recipe recipe2 = new Recipe();
-        recipe2.setId(2L);
-        recipe2.setUser(new User());
-        Recipe recipe3 = new Recipe();
-        recipe3.setId(3L);
-        recipe3.setUser(new User());
 
         Rating rating1 = new Rating();
         rating1.setTotalRating(4);
         rating1.setRecipe(recipe1);
         recipe1.setRating(rating1);
-        Rating rating2 = new Rating();
-        rating2.setTotalRating(5);
-        rating2.setRecipe(recipe2);
-        recipe2.setRating(rating2);
-        Rating rating3 = new Rating();
-        rating3.setTotalRating(2);
-        rating3.setRecipe(recipe3);
-        recipe3.setRating(rating3);
 
         List<Recipe> allRecipes = new ArrayList<>();
         allRecipes.add(recipe1);
-        allRecipes.add(recipe2);
-        allRecipes.add(recipe3);
 
-        when(recipeRepository.findAll()).thenReturn(allRecipes);
+        when(recipeRepository.findAllRecipesBelowRating(anyInt())).thenReturn(allRecipes);
 
-        List<RecipeDTO> byRatingVal = recipeService.findRecipeByRatingBelowValue(3);
+        List<RecipeDTO> byRatingVal = recipeService.findRecipeByRatingBelowValue(5);
 
         assertNotNull(byRatingVal);
         assertEquals(1, byRatingVal.size());
-        assertEquals(3, allRecipes.size());
-        verify(recipeRepository, times(1)).findAll();
+        assertEquals(1, allRecipes.size());
+        verify(recipeRepository, times(1)).findAllRecipesBelowRating(anyInt());
     }
 
     @Test

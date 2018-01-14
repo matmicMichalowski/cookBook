@@ -2,10 +2,8 @@ package com.matmic.cookbook.controller;
 
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
 import com.matmic.cookbook.controller.util.PaginationUtil;
-import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.dto.IngredientDTO;
 import com.matmic.cookbook.dto.RecipeDTO;
-import com.matmic.cookbook.repository.RecipeRepository;
 import com.matmic.cookbook.service.IngredientService;
 import com.matmic.cookbook.service.RecipeService;
 import org.springframework.data.domain.Page;
@@ -28,12 +26,10 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final IngredientService ingredientService;
-    private final RecipeRepository recipeRepository;
 
-    public RecipeController(RecipeService recipeService, IngredientService ingredientService, RecipeRepository recipeRepository) {
+    public RecipeController(RecipeService recipeService, IngredientService ingredientService) {
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
-        this.recipeRepository = recipeRepository;
     }
 
     @GetMapping("/recipes")
@@ -48,24 +44,21 @@ public class RecipeController {
         return new ResponseEntity<>(recipeService.findRecipeById(id), HttpStatus.OK);
     }
 
-//    @GetMapping("/recipes/above/{aboveValue}")
-//    public ResponseEntity<List<RecipeDTO>> getRecipesAboveRating(@PathVariable int aboveValue){
-//        return new ResponseEntity<>(recipeService.findRecipeByRatingAboveValue(aboveValue), HttpStatus.OK);
-//    }
     @GetMapping("/recipes/above/{aboveValue}")
-        public ResponseEntity<List<Recipe>> customQuery(@PathVariable int aboveValue){
-            return new ResponseEntity<>(recipeRepository.findAllRecipesAboveRating(aboveValue), HttpStatus.OK);
+        public ResponseEntity<List<RecipeDTO>> getRecipesAboveRating(@PathVariable int aboveValue){
+            return new ResponseEntity<>(recipeService.findRecipeByRatingAboveValue(aboveValue), HttpStatus.OK);
         }
 
     @GetMapping("/recipes/above/{aboveValue}/below/{belowValue}")
     public ResponseEntity<List<RecipeDTO>> getRecipesInRatingRange(@PathVariable int aboveValue, @PathVariable int belowValue){
-        return new ResponseEntity<>(recipeService.findRecipeByRatingValue(aboveValue, belowValue), HttpStatus.OK);
+        return new ResponseEntity<>(recipeService.findRecipeByRatingValueBetweenLowAndHigh(aboveValue, belowValue), HttpStatus.OK);
     }
 
     @GetMapping("/recipes/below/{belowValue}")
     public ResponseEntity<List<RecipeDTO>> getRecipesBelowRating(@PathVariable int belowValue){
         return new ResponseEntity<>(recipeService.findRecipeByRatingBelowValue(belowValue), HttpStatus.OK);
     }
+
 
     @GetMapping("/recipes/{categoryName}")
     public ResponseEntity<List<RecipeDTO>> getRecipesByCategory(@PathVariable String categoryName){

@@ -10,7 +10,7 @@ public interface RecipeService {
     Page<RecipeDTO> findAllRecipes(Pageable pageable);
     RecipeDTO findRecipeById(Long id);
     List<RecipeDTO> findRecipeByCategory(String categoryName);
-    List<RecipeDTO> findRecipeByRatingValue(int low, int high);
+    List<RecipeDTO> findRecipeByRatingValueBetweenLowAndHigh(int low, int high);
     List<RecipeDTO> findRecipeByRatingAboveValue(int aboveValue);
     List<RecipeDTO> findRecipeByRatingBelowValue(int belowValue);
     RecipeDTO createNewRecipe(RecipeDTO recipeDTO, Long userId);

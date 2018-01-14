@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class CategoryDtoToCategoryTest {
     public static final Long ID_VALUE = 1L;
-    public static final String NAME = "European";
+    public static final String NAME = "european";
 
     private CategoryDtoToCategory converter;
 

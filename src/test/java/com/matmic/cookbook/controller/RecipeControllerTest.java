@@ -5,7 +5,6 @@ import com.matmic.cookbook.domain.Rating;
 import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.RecipeDTO;
-import com.matmic.cookbook.repository.RecipeRepository;
 import com.matmic.cookbook.service.IngredientService;
 import com.matmic.cookbook.service.RecipeService;
 import org.junit.Before;
@@ -40,14 +39,11 @@ public class RecipeControllerTest {
 
     private Recipe recipe;
 
-    @Mock
-    private RecipeRepository recipeRepository;
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        final RecipeController controller = new RecipeController(recipeService, ingredientService, recipeRepository);
+        final RecipeController controller = new RecipeController(recipeService, ingredientService);
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())

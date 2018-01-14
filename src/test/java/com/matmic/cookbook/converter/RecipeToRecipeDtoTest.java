@@ -16,6 +16,7 @@ public class RecipeToRecipeDtoTest {
     public static final Difficulty DIFFICULTY = Difficulty.MODERATE;
     public static final Long RATING_ID = 1L;
     public static final String DIRECTIONS = "Recipe directions";
+    public static final String USER_NAME = "Jhon Test";
     public static final Long USER_ID = 4L;
 
     private RecipeToRecipeDto converter;
@@ -35,6 +36,7 @@ public class RecipeToRecipeDtoTest {
         recipe.setServings(SERVINGS);
         recipe.setDifficulty(DIFFICULTY);
         recipe.setDirections(DIRECTIONS);
+        recipe.setUserName(USER_NAME);
         User user = new User();
         user.setId(USER_ID);
         recipe.setUser(user);
@@ -63,6 +65,7 @@ public class RecipeToRecipeDtoTest {
         assertEquals(DIRECTIONS, recipeDTO.getDirections());
         assertEquals(NAME, recipeDTO.getName());
         assertEquals(USER_ID, recipeDTO.getUserId());
+        assertEquals(USER_NAME, recipeDTO.getUserName());
         assertEquals(1, recipeDTO.getComments().size());
         assertEquals(1,recipeDTO.getCategories().size());
     }

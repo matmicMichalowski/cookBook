@@ -6,7 +6,6 @@ import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.UnitOfMeasure;
 import com.matmic.cookbook.dto.IngredientDTO;
 import com.matmic.cookbook.dto.UnitOfMeasureDTO;
-import com.matmic.cookbook.repository.RecipeRepository;
 import com.matmic.cookbook.service.IngredientService;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,8 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class IngredientControllerTest {
 
 
-    @Mock
-    private RecipeRepository recipeRepository;
 
     @Mock
     private IngredientService ingredientService;

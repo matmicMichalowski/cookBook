@@ -37,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO saveCategory(CategoryDTO categoryDTO) {
         Category detachedCategory = categoryConv.convert(categoryDTO);
-
+        detachedCategory.setName(categoryDTO.getName().toLowerCase());
         Category savedCategory = categoryRepository.save(detachedCategory);
 
         return categoryConvDto.convert(savedCategory);

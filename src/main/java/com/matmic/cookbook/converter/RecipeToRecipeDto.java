@@ -41,6 +41,7 @@ public class RecipeToRecipeDto implements Converter<Recipe, RecipeDTO>{
         recipeDTO.setDirections(recipe.getDirections());
         recipeDTO.setRating(ratingConverter.convert(recipe.getRating()));
         recipeDTO.setName(recipe.getName());
+        recipeDTO.setUserName(recipe.getUserName());
 
         if(recipe.getCategories() != null && recipe.getCategories().size() > 0){
             recipe.getCategories().forEach(category -> recipeDTO.getCategories()

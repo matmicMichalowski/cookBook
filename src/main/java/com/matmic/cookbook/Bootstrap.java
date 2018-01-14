@@ -22,8 +22,9 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
     private final UnitOfMeasureRepository unitOfMeasureRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
-    public Bootstrap(CategoryService categoryService, IngredientService ingredientService, CategoryDtoToCategory categoryConverter, RecipeRepository recipeRepository, IngredientRepository ingredientRepository, UnitOfMeasureRepository unitOfMeasureRepository, CommentRepository commentRepository, UserRepository userRepository) {
+    public Bootstrap(CategoryService categoryService, IngredientService ingredientService, CategoryDtoToCategory categoryConverter, RecipeRepository recipeRepository, IngredientRepository ingredientRepository, UnitOfMeasureRepository unitOfMeasureRepository, CommentRepository commentRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
         this.categoryService = categoryService;
         this.ingredientService = ingredientService;
         this.categoryConverter = categoryConverter;
@@ -32,6 +33,7 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
         this.unitOfMeasureRepository = unitOfMeasureRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
     }
 
 
@@ -64,13 +66,20 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
 
         userRepository.save(user);
 
+        Category cat1 = new Category();
+        cat1.setName("European");
+
+        categoryRepository.save(cat1);
+
         Recipe recipe = new Recipe();
         //recipe.setId(2L);
+        recipe.getCategories().add(cat1);
         Rating rating = new Rating();
         rating.setRecipe(recipe);
         rating.setTotalRating(5.0);
         recipe.setRating(rating);
         recipe.setUser(user);
+        recipe.setUserName(user.getName());
         user.getRecipes().add(recipe);
 
         Ingredient ingredient = new Ingredient();
@@ -92,12 +101,6 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
         comment.setComment("Test Comment");
         commentRepository.saveAndFlush(comment);
 
-
-
-
-        System.out.println(found.getName());
-        System.out.println(category.getName());
-        System.out.println(saved.getName());
     }
 
     public void  createUom(){
