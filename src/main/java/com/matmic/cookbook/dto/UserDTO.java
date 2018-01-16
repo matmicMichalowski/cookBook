@@ -22,12 +22,11 @@ public class UserDTO {
     private Set<CommentDTO> comments = new HashSet<>();
     private Set<EvaluationDTO> evaluations = new HashSet<>();
 
-    public UserDTO(Long id, String name, String email, boolean isActive, Set<String> authorities){
+    public UserDTO(Long id, String name, String email, Set<String> authorities){
 
         this.id = id;
         this.name = name;
         this.email = email;
-        this.isActive = isActive;
         this.authorities = authorities;
     }
 
@@ -36,5 +35,6 @@ public class UserDTO {
         this.name = user.getName();
         this.email = user.getEmail();
         this.isActive = user.isActive();
+
     }
 }

@@ -1,7 +1,6 @@
 package com.matmic.cookbook.controller;
 
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
-import com.matmic.cookbook.controller.viewmodel.ResetTokenAndPasswordVM;
 import com.matmic.cookbook.controller.viewmodel.UserVM;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.UserDTO;
@@ -32,6 +31,7 @@ public class UserAccountController {
     private final UserService userService;
     private final EmailService emailService;
 
+
     public UserAccountController(UserRepository userRepository, UserService userService, EmailService emailService) {
         this.userRepository = userRepository;
         this.userService = userService;
@@ -48,13 +48,13 @@ public class UserAccountController {
         }
         return userRepository.findOneByEmail(userVM.getEmail().toLowerCase())
                 .map(user -> new ResponseEntity<>("email is in use", plainHeaders, HttpStatus.BAD_REQUEST))
-                .orElseGet(()-> userRepository.findUserByName(userVM.getName().toLowerCase())
+                .orElseGet(()-> userRepository.findUserByName(userVM.getName())
                 .map(user-> new ResponseEntity<>("username is in use", plainHeaders, HttpStatus.BAD_REQUEST))
                 .orElseGet(()->{
                     User user = userService.createUser(userVM.getName(), userVM.getEmail().toLowerCase(), userVM.getPassword());
 
                     Mail mail = new Mail(user.getEmail(), user.getName(), "Account Activation", "activationEmail",
-                            applicationUrl + "/activate?token=" + user.getActivationToken());
+                            applicationUrl + "/api/activate?token=" + user.getActivationToken());
                     emailService.sendEmailMessage(mail);
 
                     log.debug("User created with id: {}", user.getId());
@@ -82,6 +82,12 @@ public class UserAccountController {
                 .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
+    @GetMapping("/authenticate")
+    public String isAuthenticated(HttpServletRequest request){
+        log.debug("REST request to check if current user is authenticated");
+        return request.getRemoteUser();
+    }
+
     @PostMapping("/account")
     public ResponseEntity updateAndSaveAccount(@Valid @RequestBody UserDTO userDTO){
         final String userLogin = SecurityUtil.getCurrentUser();
@@ -98,7 +104,7 @@ public class UserAccountController {
                 .orElseGet(()-> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
-    @PostMapping(path = "/account/change-password", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PostMapping(path = "/account/change-password", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity changePassword(@RequestBody String password){
         if (!checkPasswordLen(password)){
             return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
@@ -107,26 +113,26 @@ public class UserAccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(path = "/account/reset-password/request")
+    @PostMapping(path = "/account/reset-password/request", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity resetPasswordRequest(@RequestBody String email, HttpServletRequest request){
         return userService.resetPasswordRequest(email)
                 .map(user -> {
                     String applicationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
                     Mail mail = new Mail(user.getEmail(), user.getName(), "Password Reset Request", "passwordResetEmail",
-                            applicationUrl + "/api/user/reset?token=" + user.getResetToken());
+                            applicationUrl + "/api/account/reset-password/complete?token=" + user.getResetToken());
+                    emailService.sendEmailMessage(mail);
                     return new ResponseEntity<>("email sent", HttpStatus.OK);
                 }).orElse(new ResponseEntity<>("email address not found", HttpStatus.BAD_REQUEST));
     }
 
-    @PostMapping(path = "/account/reset-password/reset")
-    public ResponseEntity<String> finishPasswordResetRequest(@RequestBody ResetTokenAndPasswordVM tokenAndPasswordVM){
-        if (!checkPasswordLen((tokenAndPasswordVM.getNewPassword()))){
+    @PostMapping(path = "/account/reset-password/complete")
+    public ResponseEntity<String> finishPasswordResetRequest(@RequestParam("token") String resetToken, @RequestBody String password){
+        if (!checkPasswordLen((password))){
             return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
         }
-        return userService.completeResetPasswordRequest(tokenAndPasswordVM.getNewPassword(), tokenAndPasswordVM.getResetToken())
+        return userService.completeResetPasswordRequest(password, resetToken)
                 .map(user -> new ResponseEntity<String>(HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
-
 
 }

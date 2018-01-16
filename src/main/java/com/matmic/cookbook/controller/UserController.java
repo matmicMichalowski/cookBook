@@ -2,6 +2,7 @@ package com.matmic.cookbook.controller;
 
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
 import com.matmic.cookbook.controller.util.PaginationUtil;
+import com.matmic.cookbook.controller.viewmodel.UserVM;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.RecipeDTO;
 import com.matmic.cookbook.dto.UserDTO;
@@ -59,19 +60,19 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity createUser(@Valid @RequestBody User user) throws URISyntaxException{
-        log.debug("REST request to save new User: {}", user);
+    public ResponseEntity createUser(@Valid @RequestBody UserVM userVM) throws URISyntaxException{
+        log.debug("REST request to save new User: {}", userVM);
 
-        if (user.getId() != null){
+        if (userVM.getId() != null){
             return ResponseEntity.badRequest()
                     .headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "User already have ID cannot be created."))
                     .body(null);
-        }else if (userRepository.findByEmailOrName(user.getEmail(), user.getName().toLowerCase()).isPresent()){
+        }else if (userRepository.findByEmailOrName(userVM.getEmail(), userVM.getName().toLowerCase()).isPresent()){
             return ResponseEntity.badRequest()
                     .headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "User with this name or email exists"))
                     .body(null);
         }else{
-            User newUser = userService.createUser(user);
+            User newUser = userService.createUser(userVM);
             //emailService.activationEmail(newUser);
             return ResponseEntity.created(new URI("/api/user/" + newUser.getName()))
                     .headers(HttpHeadersUtil.createdEntityAlert(ENTITY_NAME, newUser.getName()))
@@ -106,9 +107,9 @@ public class UserController {
     }
 
 
-    @GetMapping("/user/recipes")
-    public ResponseEntity<List<RecipeDTO>> findUserRecipes(@RequestParam Long id){
-        return new ResponseEntity<>(userService.findUserRecipes(id), HttpStatus.OK);
+    @GetMapping("/user/{id}/recipes")
+    public ResponseEntity<List<RecipeDTO>> findUserRecipes(@PathVariable String id){
+        return new ResponseEntity<>(userService.findUserRecipes(Long.valueOf(id)), HttpStatus.OK);
     }
 
     @GetMapping("/user/{id}")

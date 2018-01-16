@@ -4,6 +4,7 @@ import com.matmic.cookbook.converter.CategoryDtoToCategory;
 import com.matmic.cookbook.domain.*;
 import com.matmic.cookbook.dto.CategoryDTO;
 import com.matmic.cookbook.repository.*;
+import com.matmic.cookbook.security.AuthoritiesConstants;
 import com.matmic.cookbook.service.CategoryService;
 import com.matmic.cookbook.service.IngredientService;
 import org.springframework.context.ApplicationListener;
@@ -23,8 +24,9 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final AuthorityRepository authorityRepository;
 
-    public Bootstrap(CategoryService categoryService, IngredientService ingredientService, CategoryDtoToCategory categoryConverter, RecipeRepository recipeRepository, IngredientRepository ingredientRepository, UnitOfMeasureRepository unitOfMeasureRepository, CommentRepository commentRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+    public Bootstrap(CategoryService categoryService, IngredientService ingredientService, CategoryDtoToCategory categoryConverter, RecipeRepository recipeRepository, IngredientRepository ingredientRepository, UnitOfMeasureRepository unitOfMeasureRepository, CommentRepository commentRepository, UserRepository userRepository, CategoryRepository categoryRepository, AuthorityRepository authorityRepository) {
         this.categoryService = categoryService;
         this.ingredientService = ingredientService;
         this.categoryConverter = categoryConverter;
@@ -34,11 +36,13 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.authorityRepository = authorityRepository;
     }
 
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        createAuth();
         createUom();
         CategoryDTO newCategory = new CategoryDTO();
         newCategory.setName("Sweet");
@@ -122,5 +126,19 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
         UnitOfMeasure unit6 = new UnitOfMeasure();
         unit6.setName("Cup");
         unitOfMeasureRepository.save(unit6);
+    }
+
+    public void createAuth(){
+        Authority auth1 = new Authority();
+        auth1.setName(AuthoritiesConstants.USER);
+        authorityRepository.save(auth1);
+
+        Authority auth2 = new Authority();
+        auth2.setName(AuthoritiesConstants.ADMIN);
+        authorityRepository.save(auth2);
+
+        Authority auth3 = new Authority();
+        auth3.setName(AuthoritiesConstants.ANONYMOUS);
+        authorityRepository.save(auth3);
     }
 }

@@ -16,8 +16,8 @@ public class UserVM extends UserDTO{
     @Size(min = 5, max = 100)
     private String password;
 
-    public UserVM(Long id, String name, String password, String email, boolean isActive, Set<String> authorities){
-        super(id, name, email, isActive, authorities);
+    public UserVM(Long id, String name, String password, String email, Set<String> authorities){
+        super(id, name, email, authorities);
         this.password = password;
     }
 }

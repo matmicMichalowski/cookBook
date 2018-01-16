@@ -29,7 +29,9 @@ public final class SecurityUtil {
         SecurityContext sctx = SecurityContextHolder.getContext();
         Authentication authentication = sctx.getAuthentication();
         if (authentication != null){
-            return true;
+            return authentication.getAuthorities().stream().noneMatch(
+                    auth -> auth.getAuthority().equals(AuthoritiesConstants.ANONYMOUS));
+
         }
         return false;
     }

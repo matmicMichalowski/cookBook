@@ -1,6 +1,7 @@
 package com.matmic.cookbook.service;
 
 
+import com.matmic.cookbook.controller.viewmodel.UserVM;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.EvaluationDTO;
 import com.matmic.cookbook.dto.RecipeDTO;
@@ -18,7 +19,7 @@ public interface UserService {
     Optional<User> resetPasswordRequest(String userEmail);
     Optional<User> completeResetPasswordRequest(String newPassword, String resetToken);
     void changePassword(String password);
-    User createUser(User user);
+    User createUser(UserVM userVM);
     User createUser(String name, String email, String password);
     UserDTO updateUser(UserDTO userDTO);
     UserDTO findUserDTOByID(Long id);

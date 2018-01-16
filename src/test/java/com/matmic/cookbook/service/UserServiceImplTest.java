@@ -1,5 +1,6 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.controller.viewmodel.UserVM;
 import com.matmic.cookbook.converter.EvaluationToEvaluationDto;
 import com.matmic.cookbook.converter.RecipeToRecipeDto;
 import com.matmic.cookbook.converter.UserDtoToUser;
@@ -18,9 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -149,18 +148,28 @@ public class UserServiceImplTest {
     @Test
     public void createUserByUserModel() throws Exception {
 
+        Set<String> authorities = new HashSet<>();
+        String testAuth = "testUserAuth";
+        authorities.add(testAuth);
+
+        UserVM userVM = new UserVM(
+                null, "TestName", "TestPass", "test@mail.com", authorities
+        );
+        userVM.setEmail("mail@mail.com");
+        userVM.setName("NameTest");
+
         Authority authority = new Authority();
         authority.setName("ADMIN");
 
         when(userRepository.count()).thenReturn(0L);
         when(authorityRepository.findOneByName(anyString())).thenReturn(authority);
-        User createdUser = userService.createUser(user);
+        User createdUser = userService.createUser(userVM);
 
 
         assertNotNull(createdUser);
         assertNotNull(createdUser.getActivationToken());
-        assertEquals(user.getName(), createdUser.getName());
-        assertEquals(user.getEmail(), createdUser.getEmail());
+        assertEquals(userVM.getName(), createdUser.getName());
+        assertEquals(userVM.getEmail(), createdUser.getEmail());
         assertEquals("ADMIN", createdUser.getAuthorities().iterator().next().getName());
 
     }

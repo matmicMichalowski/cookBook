@@ -1,5 +1,6 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.controller.viewmodel.UserVM;
 import com.matmic.cookbook.converter.EvaluationToEvaluationDto;
 import com.matmic.cookbook.converter.RecipeToRecipeDto;
 import com.matmic.cookbook.converter.UserDtoToUser;
@@ -11,6 +12,7 @@ import com.matmic.cookbook.dto.RecipeDTO;
 import com.matmic.cookbook.dto.UserDTO;
 import com.matmic.cookbook.repository.AuthorityRepository;
 import com.matmic.cookbook.repository.UserRepository;
+import com.matmic.cookbook.security.AuthoritiesConstants;
 import com.matmic.cookbook.security.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,35 +99,34 @@ public class UserServiceImpl implements UserService {
                 user -> {
                     String encryptedPassword = passwordEncoder.encode(password);
                     user.setPassword(encryptedPassword);
-
                 });
     }
 
 
     @Override
-    public User createUser(User user) {
+    public User createUser(UserVM userVM) {
         User newUser = new User();
 
         if (userRepository.count() == 0){
-            newUser.getAuthorities().add(authorityRepository.findOneByName("ADMIN"));
+            newUser.getAuthorities().add(authorityRepository.findOneByName(AuthoritiesConstants.ADMIN));
         }else{
-            newUser.getAuthorities().add(authorityRepository.findOneByName("USER"));
+            newUser.getAuthorities().add(authorityRepository.findOneByName(AuthoritiesConstants.USER));
         }
 
-        String encryptedPassword = passwordEncoder.encode(user.getPassword());
+        String encryptedPassword = passwordEncoder.encode(userVM.getPassword());
         newUser.setPassword(encryptedPassword);
-        newUser.setEmail(user.getEmail());
-        newUser.setName(user.getName());
+        newUser.setEmail(userVM.getEmail());
+        newUser.setName(userVM.getName());
         newUser.setActivationToken(UUID.randomUUID().toString());
         userRepository.save(newUser);
-        log.debug("Created new user: {}", newUser);
+        log.debug("Created new userVM: {}", newUser);
         return newUser;
     }
 
     @Override
     public User createUser(String name, String email, String password) {
         User user = new User();
-        Authority authority = authorityRepository.findOneByName("USER");
+        Authority authority = authorityRepository.findOneByName(AuthoritiesConstants.USER);
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         user.setName(name);
@@ -135,7 +136,7 @@ public class UserServiceImpl implements UserService {
         authorities.add(authority);
         user.setAuthorities(authorities);
         user.setActivationToken(UUID.randomUUID().toString());
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
         log.debug("Created new user: {}", user);
         return user;
     }
@@ -146,6 +147,7 @@ public class UserServiceImpl implements UserService {
         if (optional.isPresent()) {
             User detachedUser = toUser.convert(userDTO);
             User savedUser = userRepository.save(detachedUser);
+            log.debug("User updated: {}", userDTO.getId());
             return toUserDto.convert(savedUser);
         }
         return null;
@@ -156,8 +158,10 @@ public class UserServiceImpl implements UserService {
         Optional<User> optional = userRepository.findById(id);
 
         if(optional.isPresent()){
+            log.debug("User found.");
             return toUserDto.convert(optional.get());
         }
+        log.debug("No such user in database.");
         return null;
     }
 
