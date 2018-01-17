@@ -26,7 +26,7 @@ public class DomainUserDetailsService implements UserDetailsService {
     private final LoginAttemptControlService loginAttemptControlService;
 
 
-    private  HttpServletRequest request;
+    private HttpServletRequest request;
 
     @Bean
     public RequestContextListener requestContextListener(){
@@ -49,17 +49,17 @@ public class DomainUserDetailsService implements UserDetailsService {
             throw new LockedException("blocked");
         }
 
-        String lowercaseUsername = userLogin.toLowerCase();
-        Optional<User> findUser = userRepository.findOneWithAuthoritiesByName(lowercaseUsername);
+        //String lowercaseUsername = userLogin.toLowerCase();
+        Optional<User> findUser = userRepository.findOneWithAuthoritiesByName(userLogin);
         return findUser.map(user -> {
             if(!user.isActive()){
-                throw new UserInactiveException("User with login " + lowercaseUsername + " is inactive.");
+                throw new UserInactiveException("User with login " + userLogin + " is inactive.");
             }
             List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                     .map(authority -> new SimpleGrantedAuthority(authority.getName()))
                     .collect(Collectors.toList());
-            return new org.springframework.security.core.userdetails.User(lowercaseUsername, user.getPassword(), grantedAuthorities);
-        }).orElseThrow(() -> new UsernameNotFoundException("This username (" + lowercaseUsername + ") was not found in database"));
+            return new org.springframework.security.core.userdetails.User(userLogin, user.getPassword(), grantedAuthorities);
+        }).orElseThrow(() -> new UsernameNotFoundException("This username (" + userLogin + ") was not found in database"));
     }
 
     private String getIp(){

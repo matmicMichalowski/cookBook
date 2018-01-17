@@ -15,8 +15,6 @@ import java.util.List;
 @RequestMapping("/api")
 public class EvaluationController {
 
-    private static final String ENTITY_NAME = "evaluation";
-
     private final EvaluationService evaluationService;
 
     public EvaluationController(EvaluationService evaluationService) {

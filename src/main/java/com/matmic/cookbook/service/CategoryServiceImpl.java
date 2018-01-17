@@ -43,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryConvDto.convert(savedCategory);
     }
 
+    @Override
     public Category findByName(String name){
         Optional<Category> categoryOptional = categoryRepository.findCategoryByName(name);
         if (categoryOptional.isPresent()){

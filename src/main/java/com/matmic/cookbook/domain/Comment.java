@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
@@ -21,13 +23,16 @@ public class Comment implements Serializable {
     private Long id;
 
     @Lob
+    @Size(min = 5, max = 500)
     private String comment;
 
     @ManyToOne
+    @NotNull
     @JsonBackReference
     private User user;
 
     @ManyToOne
+    @NotNull
     @JsonBackReference
     private Recipe recipe;
 

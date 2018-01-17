@@ -125,7 +125,7 @@ public class UserController {
     }
 
     @DeleteMapping("/user/{id}")
-    @Secured("ADMIN")
+    //@Secured("ADMIN")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         log.debug("REST request to delete User: {}", id);
         userService.deleteUser(id);

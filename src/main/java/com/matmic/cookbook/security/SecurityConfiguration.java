@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.PostConstruct;
@@ -75,25 +74,32 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 //        .frameOptions().disable();
 
         http
-                .csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-        .and()
+                .csrf().disable()
+//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//       .and()
              .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
              .exceptionHandling()
              .authenticationEntryPoint(unauthorizedEntryPointHttp401())
        .and()
+              .headers()
+                .frameOptions()
+                .disable()
+       .and()
               .authorizeRequests()
               .antMatchers("/api/login").permitAll()
               .antMatchers("/api/ok").permitAll()
+              .antMatchers("/api/activate").permitAll()
               .antMatchers("/api/register").permitAll()
+              .antMatchers("/api/authenticate").permitAll()
+              .antMatchers("/api/authentication").permitAll()
               .antMatchers("/api/registration").permitAll()
-              .antMatchers("/reset-password").permitAll()
-              .antMatchers("/reset").permitAll()
+              .antMatchers("/api/reset-password").permitAll()
+              .antMatchers("/api/reset").permitAll()
               .antMatchers("/400error").permitAll()
               .antMatchers(HttpMethod.GET, "/api/recipes").permitAll()
               .antMatchers(HttpMethod.GET, "/api/recipe/**").permitAll()
               .antMatchers(HttpMethod.POST, "/api/user").permitAll()
-              .antMatchers("/api/**").authenticated()
+              .antMatchers("/api/ingredient**").fullyAuthenticated()
         .and()
               .formLogin()
               .loginProcessingUrl("/api/authentication")
@@ -101,10 +107,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
               .failureHandler(authenticationFailureHandler())
               .usernameParameter("username")
               .passwordParameter("password")
-              .permitAll();
-//        .and()
-//              .csrf()
-//              .disable();
+              .permitAll()
+        .and()
+                .logout()
+                .logoutUrl("/api/logout")
+                .permitAll();
     }
 
     @Override

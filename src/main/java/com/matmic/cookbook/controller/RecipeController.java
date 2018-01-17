@@ -86,7 +86,7 @@ public class RecipeController {
                 .body(savedRecipe);
     }
 
-    @PutMapping("/user/{userID}/recipe")
+    @PutMapping("/user/{userId}/recipe")
     public ResponseEntity<RecipeDTO> updateRecipe(@RequestBody RecipeDTO recipeDTO, @PathVariable Long userId) throws URISyntaxException{
         if (recipeDTO.getId() == null){
             return createRecipe(recipeDTO, userId);

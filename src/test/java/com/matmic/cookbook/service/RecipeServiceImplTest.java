@@ -37,6 +37,12 @@ public class RecipeServiceImplTest {
     private RecipeDtoToRecipe toRecipe;
 
     @Mock
+    private CategoryService categoryService;
+
+    @Mock
+    private UnitOfMeasureDtoToUnitOfMeasure toUnitOfMeasure;
+
+    @Mock
     private UserService userService;
 
     private RecipeService recipeService;
@@ -54,7 +60,8 @@ public class RecipeServiceImplTest {
         toRecipeDto = new RecipeToRecipeDto(new RatingToRatingDto(new EvaluationToEvaluationDto()), new CategoryToCategoryDto(),
                 new IngredientToIngredientDto(new UnitOfMeasureToUnitOfMeasureDto()), new CommentToCommentDto());
 
-        recipeService = new RecipeServiceImpl(recipeRepository, toRecipeDto, toRecipe, userService);
+        recipeService = new RecipeServiceImpl(recipeRepository, toRecipeDto, toRecipe
+                , categoryService, userService, toUnitOfMeasure);
 
         recipe = new Recipe();
         recipe.setId(1L);

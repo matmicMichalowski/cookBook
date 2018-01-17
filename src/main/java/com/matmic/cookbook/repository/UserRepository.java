@@ -1,7 +1,6 @@
 package com.matmic.cookbook.repository;
 
 import com.matmic.cookbook.domain.User;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,7 +11,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailOrName(String email, String name);
 
     @EntityGraph(attributePaths = "authorities")
-    @Cacheable(cacheNames = "user")
     Optional<User> findOneWithAuthoritiesByName(String username);
     Optional<User> findOneByActivationToken(String activationToken);
     Optional<User> findOneByEmail(String email);

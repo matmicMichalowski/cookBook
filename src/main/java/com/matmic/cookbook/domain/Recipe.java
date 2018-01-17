@@ -26,7 +26,7 @@ public class Recipe implements Serializable {
     private int servings;
     private Difficulty difficulty;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "recipe", cascade = CascadeType.ALL)
     @JsonManagedReference
     private Rating rating;
 
@@ -40,7 +40,7 @@ public class Recipe implements Serializable {
 
     private String userName;
 
-    @OneToMany
+    @ManyToMany
     private Set<Category> categories = new HashSet<>();
 
 

@@ -22,6 +22,9 @@ public class WebConfiguration {
         UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        config.addAllowedOrigin("*");
+        config.setAllowCredentials(true);
+        config.setMaxAge(1800L);
         log.debug("Registering of CORS filter");
         src.registerCorsConfiguration("/api/**", config);
         src.registerCorsConfiguration("/api/register", config);

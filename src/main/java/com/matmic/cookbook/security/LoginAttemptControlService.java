@@ -19,7 +19,7 @@ public class LoginAttemptControlService {
     public LoginAttemptControlService(){
         super();
         attemptsCache = CacheBuilder.newBuilder()
-                .expireAfterWrite(1, TimeUnit.DAYS).build(new CacheLoader<String, Integer>() {
+                .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>() {
                     public Integer load(String key){
                         return 0;
                     }
@@ -31,7 +31,7 @@ public class LoginAttemptControlService {
     }
 
     public void loginFailed(String key){
-        int attempts = 0;
+        int attempts;
         try{
             attempts = attemptsCache.get(key);
         }catch (ExecutionException ex){

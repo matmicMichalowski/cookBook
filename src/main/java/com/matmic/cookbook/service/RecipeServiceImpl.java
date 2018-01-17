@@ -2,6 +2,8 @@ package com.matmic.cookbook.service;
 
 import com.matmic.cookbook.converter.RecipeDtoToRecipe;
 import com.matmic.cookbook.converter.RecipeToRecipeDto;
+import com.matmic.cookbook.converter.UnitOfMeasureDtoToUnitOfMeasure;
+import com.matmic.cookbook.domain.Ingredient;
 import com.matmic.cookbook.domain.Rating;
 import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
@@ -27,14 +29,20 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeToRecipeDto toRecipeDto;
     private final RecipeDtoToRecipe toRecipe;
+    private final CategoryService categoryService;
     private final UserService userService;
+    private final UnitOfMeasureDtoToUnitOfMeasure toUnitOfMeasure;
 
 
-    public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeToRecipeDto toRecipeDto, RecipeDtoToRecipe toRecipe, UserService userService) {
+    public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeToRecipeDto toRecipeDto, RecipeDtoToRecipe toRecipe,
+                             CategoryService categoryService, UserService userService,
+                             UnitOfMeasureDtoToUnitOfMeasure toUnitOfMeasure) {
         this.recipeRepository = recipeRepository;
         this.toRecipeDto = toRecipeDto;
         this.toRecipe = toRecipe;
+        this.categoryService = categoryService;
         this.userService = userService;
+        this.toUnitOfMeasure = toUnitOfMeasure;
     }
 
 
@@ -90,14 +98,31 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public RecipeDTO createNewRecipe(RecipeDTO recipeDTO, Long userId){
         log.debug("Request to create and save new Recipe: {}", recipeDTO);
-        Recipe recipe = toRecipe.convert(recipeDTO);
+        Recipe newRecipe = new Recipe();
+        newRecipe.setName(recipeDTO.getName());
+        newRecipe.setDifficulty(recipeDTO.getDifficulty());
+        newRecipe.setDirections(recipeDTO.getDirections());
+        recipeDTO.getCategories().forEach(cat ->
+                newRecipe.getCategories().add(categoryService.findByName(cat.getName())));
+        newRecipe.setServings(recipeDTO.getServings());
+        newRecipe.setCookTime(recipeDTO.getCookTime());
+        recipeDTO.getIngredients().forEach(ingredientDTO -> {
+            Ingredient ingredient = new Ingredient();
+            ingredient.setName(ingredientDTO.getName());
+            ingredient.setAmount(ingredientDTO.getAmount());
+            ingredient.setUnitOfMeasure(toUnitOfMeasure.convert(ingredientDTO.getUnitOfMeasure()));
+            ingredient.setName(ingredientDTO.getName());
+            ingredient.setRecipe(newRecipe);
+            newRecipe.getIngredients().add(ingredient);
+        });
+        //Recipe newRecipe = toRecipe.convert(recipeDTO);
         User user = userService.findUserByID(userId);
         if ( user == null){
             return null;
         }
-        recipe.setUser(user);
-        recipe.setUserName(user.getName());
-        Recipe savedRecipe = recipeRepository.save(recipe);
+        newRecipe.setUser(user);
+        newRecipe.setUserName(user.getName());
+        Recipe savedRecipe = recipeRepository.save(newRecipe);
 
         return toRecipeDto.convert(savedRecipe);
     }
