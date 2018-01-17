@@ -218,7 +218,7 @@ public class RecipeServiceImplTest {
 
         when(recipeRepository.save(any())).thenReturn(recipe);
 
-        RecipeDTO recipeSaved = recipeService.saveOrUpdateRecipe(recipeDTO);
+        RecipeDTO recipeSaved = recipeService.saveAndUpdateRecipe(recipeDTO);
 
         assertNotNull(recipeSaved);
         verify(recipeRepository, times(1)).save(any());

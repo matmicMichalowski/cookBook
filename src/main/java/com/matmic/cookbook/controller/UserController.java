@@ -124,6 +124,13 @@ public class UserController {
         return userService.getAuthorities();
     }
 
+
+    /**
+     * DELETE /user/:id : delete User with given id
+     *
+     * @param id the id of the User to delete
+     * @return ResponseEntity with status 200 OK
+     */
     @DeleteMapping("/user/{id}")
     //@Secured("ADMIN")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){

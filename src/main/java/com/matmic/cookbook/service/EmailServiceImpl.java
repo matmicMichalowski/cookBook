@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -15,7 +16,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 
-
+/**
+ * Service Implementation for managing Email
+ */
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -33,6 +36,12 @@ public class EmailServiceImpl implements EmailService {
         this.templateEngine = templateEngine;
     }
 
+    /**
+     * Send email
+     *
+     * @param mail model to get data from, to send email to user
+     */
+    @Async
     @Override
     public void sendEmailMessage(Mail mail){
 

@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Service Implementation for managing Recipe
+ */
 @Service
 @Transactional
 public class RecipeServiceImpl implements RecipeService {
@@ -45,14 +48,27 @@ public class RecipeServiceImpl implements RecipeService {
         this.toUnitOfMeasure = toUnitOfMeasure;
     }
 
-
+    /**
+     * Get all recipes
+     *
+     * @param pageable the pagination information
+     * @return list of entities
+     */
     @Override
+    @Transactional(readOnly = true)
     public Page<RecipeDTO> findAllRecipes(Pageable pageable) {
         log.debug("Request to get all Recipes");
         return recipeRepository.findAll(pageable).map(toRecipeDto::convert);
     }
 
+    /**
+     * Get one recipe by id
+     *
+     * @param id the id of entity
+     * @return the entity
+     */
     @Override
+    @Transactional(readOnly = true)
     public RecipeDTO findRecipeById(Long id) {
         log.debug("Request to get Recipe: {}", id);
         Optional<Recipe> optional = recipeRepository.findById(id);
@@ -63,7 +79,14 @@ public class RecipeServiceImpl implements RecipeService {
         return null;
     }
 
+    /**
+     * Get recipes by category name
+     *
+     * @param categoryName the name of category entity
+     * @return list of all recipes by category
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByCategory(String categoryName) {
         log.debug("Request to get all Recipes with given category: {}", categoryName);
         return recipeRepository.findAllByCategoryName(categoryName.toLowerCase()).stream()
@@ -71,7 +94,15 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get recipes between given rating value
+     *
+     * @param low rating low value
+     * @param high rating high value
+     * @return list of entities
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByRatingValueBetweenLowAndHigh(int low, int high) {
         log.debug("Request to get all Recipes within rating value range: {}, {}", low, high);
         return recipeRepository.findAllRecipesBetweenRatingValues(low, high).stream()
@@ -79,7 +110,14 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get recipes above given value
+     *
+     * @param aboveValue an indicator above which recipes will be found
+     * @return list of entities
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByRatingAboveValue(int aboveValue) {
         log.debug("Request to get all Recipes with rating above: {}", aboveValue);
         return recipeRepository.findAllRecipesAboveRating(aboveValue).stream()
@@ -87,7 +125,14 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get recipes below given value
+     *
+     * @param belowValue an indicator below which recipes will be found
+     * @return list of entities
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByRatingBelowValue(int belowValue) {
         log.debug("Request to get all Recipes with rating below: {}", belowValue);
         return recipeRepository.findAllRecipesBelowRating(belowValue).stream()
@@ -95,10 +140,23 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Create and save new Recipe entity
+     *
+     * @param recipeDTO entity to be saved
+     * @param userId id of user who post recipe
+     * @return saved entity
+     */
     @Override
     public RecipeDTO createNewRecipe(RecipeDTO recipeDTO, Long userId){
         log.debug("Request to create and save new Recipe: {}", recipeDTO);
+        User user = userService.findUserByID(userId);
+        if ( user == null){
+            return null;
+        }
         Recipe newRecipe = new Recipe();
+        newRecipe.setUser(user);
+        newRecipe.setUserName(user.getName());
         newRecipe.setName(recipeDTO.getName());
         newRecipe.setDifficulty(recipeDTO.getDifficulty());
         newRecipe.setDirections(recipeDTO.getDirections());
@@ -115,20 +173,20 @@ public class RecipeServiceImpl implements RecipeService {
             ingredient.setRecipe(newRecipe);
             newRecipe.getIngredients().add(ingredient);
         });
-        //Recipe newRecipe = toRecipe.convert(recipeDTO);
-        User user = userService.findUserByID(userId);
-        if ( user == null){
-            return null;
-        }
-        newRecipe.setUser(user);
-        newRecipe.setUserName(user.getName());
+
         Recipe savedRecipe = recipeRepository.save(newRecipe);
 
         return toRecipeDto.convert(savedRecipe);
     }
 
+    /**
+     * Save and update Recipe entity
+     *
+     * @param recipeDTO entity to be updated
+     * @return saved and updated entity
+     */
     @Override
-    public RecipeDTO saveOrUpdateRecipe(RecipeDTO recipeDTO) {
+    public RecipeDTO saveAndUpdateRecipe(RecipeDTO recipeDTO) {
         log.debug("Request to update and save Recipe: {}", recipeDTO);
         Recipe detachedRecipe = toRecipe.convert(recipeDTO);
         Optional<Recipe> optional = recipeRepository.findById(recipeDTO.getId());
@@ -145,6 +203,11 @@ public class RecipeServiceImpl implements RecipeService {
         return toRecipeDto.convert(detachedRecipe);
     }
 
+    /**
+     * Delete Recipe by entity id
+     *
+     * @param id entity id
+     */
     @Override
     public void deleteRecipe(Long id) {
         log.debug("Request to delete Recipe: {}", id);

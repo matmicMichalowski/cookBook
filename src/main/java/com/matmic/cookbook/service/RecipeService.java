@@ -14,6 +14,6 @@ public interface RecipeService {
     List<RecipeDTO> findRecipeByRatingAboveValue(int aboveValue);
     List<RecipeDTO> findRecipeByRatingBelowValue(int belowValue);
     RecipeDTO createNewRecipe(RecipeDTO recipeDTO, Long userId);
-    RecipeDTO saveOrUpdateRecipe(RecipeDTO recipeDTO);
+    RecipeDTO saveAndUpdateRecipe(RecipeDTO recipeDTO);
     void deleteRecipe(Long id);
 }

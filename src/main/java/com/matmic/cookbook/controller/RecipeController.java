@@ -32,6 +32,12 @@ public class RecipeController {
         this.ingredientService = ingredientService;
     }
 
+    /**
+     * GET /recipes : get all Recipes
+     *
+     * @param pageable pagination information
+     * @return ResponseEntity with status 200 OK and body with list of recipeDTO
+     */
     @GetMapping("/recipes")
     public ResponseEntity<List<RecipeDTO>> getAllRecipes(Pageable pageable){
         Page<RecipeDTO> page = recipeService.findAllRecipes(pageable);
@@ -39,42 +45,95 @@ public class RecipeController {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
+    /**
+     * GET /recipe/:id : get Recipe by id
+     *
+     * @param id the id of recipe
+     * @return ResponseEntity with status 200 OK and body with recipeDTO
+     */
     @GetMapping("/recipe/{id}")
     public ResponseEntity<RecipeDTO> getRecipeById(@PathVariable Long id){
         return new ResponseEntity<>(recipeService.findRecipeById(id), HttpStatus.OK);
     }
 
+    /**
+     * GET /recipe/above/:aboveValue : get all recipes with rating above given value
+     *
+     * @param aboveValue above boundary value
+     * @return ResponseEntity with status 200 OK and body with recipeDTO list
+     */
     @GetMapping("/recipes/above/{aboveValue}")
         public ResponseEntity<List<RecipeDTO>> getRecipesAboveRating(@PathVariable int aboveValue){
             return new ResponseEntity<>(recipeService.findRecipeByRatingAboveValue(aboveValue), HttpStatus.OK);
         }
 
+    /**
+     * GET /recipe/above/:aboveValue : get all recipes between given rating values
+     *
+     * @param aboveValue above boundary value
+     * @param belowValue below boundary value
+     * @return ResponseEntity with status 200 OK and body with recipeDTO list
+     */
     @GetMapping("/recipes/above/{aboveValue}/below/{belowValue}")
     public ResponseEntity<List<RecipeDTO>> getRecipesInRatingRange(@PathVariable int aboveValue, @PathVariable int belowValue){
         return new ResponseEntity<>(recipeService.findRecipeByRatingValueBetweenLowAndHigh(aboveValue, belowValue), HttpStatus.OK);
     }
 
+
+    /**
+     * GET /recipe/above/:belowValue : get all recipes with rating below given value
+     *
+     * @param belowValue below boundary value
+     * @return ResponseEntity with status 200 OK and body with recipeDTO list
+     */
     @GetMapping("/recipes/below/{belowValue}")
     public ResponseEntity<List<RecipeDTO>> getRecipesBelowRating(@PathVariable int belowValue){
         return new ResponseEntity<>(recipeService.findRecipeByRatingBelowValue(belowValue), HttpStatus.OK);
     }
 
-
+    /**
+     * GET /recipe/:categoryName : get all recipes with given category
+     *
+     * @param categoryName above boundary value
+     * @return ResponseEntity with status 200 OK and body with recipeDTO
+     */
     @GetMapping("/recipes/{categoryName}")
     public ResponseEntity<List<RecipeDTO>> getRecipesByCategory(@PathVariable String categoryName){
         return new ResponseEntity<>(recipeService.findRecipeByCategory(categoryName), HttpStatus.OK);
     }
 
+    /**
+     * GET /recipe/:id/ingredients : get all ingredients from recipe
+     *
+     * @param id recipe id
+     * @return ResponseEntity with status 200 OK and set of ingredientDTO body
+     */
     @GetMapping("/recipe/{id}/ingredients")
     public ResponseEntity<Set<IngredientDTO>> getIngredientsFromRecipe(@PathVariable Long id){
         return new ResponseEntity<>(ingredientService.getAllIngredientsFromRecipe(id), HttpStatus.OK);
     }
 
+    /**
+     * GET /recipe/:id/ingredient/:ingredientId : get one ingredient from recipe by id
+     *
+     * @param id the recipe id
+     * @param ingredientId the ingredient id
+     * @return ResponseEntity with status 200 OK with ingredientDTO in body
+     */
     @GetMapping("/recipe/{id}/ingredient/{ingredientId}")
     public ResponseEntity<IngredientDTO> findIngredientInRecipe(@PathVariable Long id, @PathVariable Long ingredientId){
         return new ResponseEntity<>(ingredientService.findByRecipeIdAndIngredientId(id, ingredientId), HttpStatus.OK);
     }
 
+    /**
+     * POST /user/:userId/recipe : create new recipe
+     *
+     * @param recipeDTO recipeDTO to save
+     * @param userId user id
+     * @return the ResponseEntity with status 201 Created and with body of saved recipeDTO,
+     * or with status 400 BadRequest if recipeDTO has already an ID parameter
+     * @throws URISyntaxException if new Recipe Location URI syntax is incorrect
+     */
     @PostMapping("user/{userId}/recipe")
     public ResponseEntity<RecipeDTO> createRecipe(@RequestBody RecipeDTO recipeDTO, @PathVariable Long userId) throws URISyntaxException{
         if (recipeDTO.getId() != null){
@@ -86,16 +145,31 @@ public class RecipeController {
                 .body(savedRecipe);
     }
 
+    /**
+     * PUT /:id : update Recipe with given id
+     *
+     * @param recipeDTO recipeDTO to be udated
+     * @param userId user id
+     * @return the ResponseEntity with status 200 OK and with body the updated recipeDTO,
+     * or with status 400 Bad Request if the recipeDTO is not valid,
+     * @throws URISyntaxException if the Recipe Location URI syntax is incorrect
+     */
     @PutMapping("/user/{userId}/recipe")
     public ResponseEntity<RecipeDTO> updateRecipe(@RequestBody RecipeDTO recipeDTO, @PathVariable Long userId) throws URISyntaxException{
         if (recipeDTO.getId() == null){
             return createRecipe(recipeDTO, userId);
         }
-        RecipeDTO updated = recipeService.saveOrUpdateRecipe(recipeDTO);
+        RecipeDTO updated = recipeService.saveAndUpdateRecipe(recipeDTO);
         return ResponseEntity.ok().headers(HttpHeadersUtil.updateEntityAlert(ENTITY_NAME, updated.getId().toString()))
                 .body(updated);
     }
 
+    /**
+     * DELETE /recipe/:id : delete Recipe by id
+     *
+     * @param id id of Recipe to delete
+     * @return ResponseEntity with status 200 OK
+     */
     @DeleteMapping("/recipe/{id}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable Long id){
         recipeService.deleteRecipe(id);
