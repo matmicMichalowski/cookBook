@@ -24,7 +24,8 @@ public class Rating implements Serializable {
 
     private int evaluationSum;
 
-    private double totalRating;
+
+    private String totalRating;
 
     @OneToMany
     private Set<Evaluation> usersEvaluations = new HashSet<>();
@@ -32,5 +33,14 @@ public class Rating implements Serializable {
     @OneToOne
     @JsonBackReference
     private Recipe recipe;
+
+    public void setTotalRating(double rating){
+
+        this.totalRating = String.format("%.2f", rating);
+    }
+
+    public void setTotalRating(String rating){
+        this.totalRating = rating;
+    }
 
 }

@@ -18,6 +18,9 @@ public class CommentDTO {
     @Size(min = 5, max = 500)
     private String comment;
 
+
+    private String userName;
+
     @NotNull
     @Min(1)
     private Long userId;

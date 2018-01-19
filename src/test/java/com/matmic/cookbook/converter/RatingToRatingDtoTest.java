@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class RatingToRatingDtoTest {
     public static final Long ID_VALUE = 1L;
-    public static final double TOTAL_RATING = 5.0;
+    public static final String TOTAL_RATING = "5.00";
     public static final int EVALUATION_SUM = 20;
     public static final Long RECIPE_ID = 4L;
 

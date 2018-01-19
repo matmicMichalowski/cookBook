@@ -33,20 +33,22 @@ public class RatingServiceImpl implements RatingService {
         this.toEvaluation = toEvaluation;
         this.toRatingDto = toRatingDto;
         this.ratingRepository = ratingRepository;
-
     }
 
     /**
-     * Save and Update Rating
+     * Update Rating
      *
      * @param evaluationDTO evaluation entity
-     * @return saved and updated Rating entity
+     * @return updated RatingDTO
      */
     @Override
-    public RatingDTO saveAndUpdateRating(EvaluationDTO evaluationDTO) {
-        log.debug("Request to update and save Rating with Evaluation: {}", evaluationDTO);
+    public RatingDTO updateRating(EvaluationDTO evaluationDTO) {
+        log.debug("Request to update Rating with Evaluation: {}", evaluationDTO);
         Optional<Rating> optional = ratingRepository.findById(evaluationDTO.getRatingId());
 
+        if (!optional.isPresent()){
+            return null;
+        }
         Rating ratingToSave = optional.get();
         Evaluation evaluationToAdd = toEvaluation.convert(evaluationDTO);
 
@@ -68,9 +70,9 @@ public class RatingServiceImpl implements RatingService {
         ratingToSave.setEvaluationSum(evaluationSum);
         ratingToSave.setTotalRating((double)evaluationSum / (double)ratingToSave.getUsersEvaluations().size());
 
-        Rating savedRating = ratingRepository.save(ratingToSave);
+        Rating updatedRating = ratingRepository.save(ratingToSave);
 
-        return toRatingDto.convert(savedRating);
+        return toRatingDto.convert(updatedRating);
     }
 
     /**

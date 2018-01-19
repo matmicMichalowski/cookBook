@@ -1,5 +1,6 @@
 package com.matmic.cookbook.service;
 
+import com.matmic.cookbook.converter.EvaluationDtoToEvaluation;
 import com.matmic.cookbook.converter.EvaluationToEvaluationDto;
 import com.matmic.cookbook.domain.Evaluation;
 import com.matmic.cookbook.domain.Rating;
@@ -26,6 +27,8 @@ public class EvaluationServiceImplTest {
 
     private EvaluationToEvaluationDto toEvaluationDto = new EvaluationToEvaluationDto();
 
+    private EvaluationDtoToEvaluation toEvaluation = new EvaluationDtoToEvaluation();
+
     @Mock
     private EvaluationRepository evaluationRepository;
 
@@ -39,7 +42,7 @@ public class EvaluationServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        evaluationService = new EvaluationServiceImpl(toEvaluationDto, evaluationRepository, userRepository);
+        evaluationService = new EvaluationServiceImpl(toEvaluationDto, toEvaluation, evaluationRepository, userRepository);
     }
 
     @Test
@@ -77,30 +80,50 @@ public class EvaluationServiceImplTest {
         verify(evaluationRepository, times(1)).findById(anyLong());
     }
 
-//    @Test
-//    public void saveEvaluation() throws Exception {
-//        EvaluationDTO evaluationDTO = new EvaluationDTO();
-//        evaluationDTO.setId(1L);
-//        evaluationDTO.setUserId(3L);
-//
-//        EvaluationDTO evDTO = new EvaluationDTO();
-//        evDTO.setId(2L);
-//        evDTO.setUserId(4L);
-//
-//
-//
-//        RatingDTO ratingDTO = new RatingDTO();
-//        ratingDTO.getUsersEvaluations().add(evaluationDTO);
-//        ratingDTO.getUsersEvaluations().add(evDTO);
-//
-//
-//        when(ratingService.saveAndUpdateRating(any())).thenReturn(ratingDTO);
-//
-//        EvaluationDTO evSaved = evaluationService.saveEvaluation(evaluationDTO);
-//
-//        assertNotNull(evSaved);
-//        verify(ratingService, times(1)).saveAndUpdateRating(any());
-//    }
+    @Test
+    public void saveEvaluation() throws Exception {
+        Evaluation evaluation = new Evaluation();
+        evaluation.setId(1L);
+        evaluation.setUser(new User());
+        evaluation.getUser().setId(3L);
+        evaluation.setRating(new Rating());
+        evaluation.getRating().setId(5L);
+        evaluation.setScore(4);
 
+        when(evaluationRepository.save(any())).thenReturn(evaluation);
+
+        EvaluationDTO evSaved = evaluationService.saveNewEvaluation(any());
+
+        assertNotNull(evSaved);
+        assertEquals(evaluation.getUser().getId(), evSaved.getUserId());
+        assertEquals(evaluation.getRating().getId(), evSaved.getRatingId());
+        assertEquals(evaluation.getScore(), evSaved.getScore());
+        verify(evaluationRepository, times(1)).save(any());
+    }
+
+    @Test
+    public void updateEvaluation() throws Exception {
+        Evaluation evaluation = new Evaluation();
+        evaluation.setId(1L);
+        evaluation.setUser(new User());
+        evaluation.getUser().setId(3L);
+        evaluation.setRating(new Rating());
+        evaluation.getRating().setId(5L);
+        evaluation.setScore(4);
+
+        EvaluationDTO evaluationDTO = new EvaluationDTO();
+        evaluationDTO.setId(evaluation.getId());
+        evaluationDTO.setRatingId(evaluation.getRating().getId());
+        evaluationDTO.setUserId(evaluation.getUser().getId());
+        evaluationDTO.setScore(2);
+
+        when(evaluationRepository.findById(anyLong())).thenReturn(Optional.of(evaluation));
+        when(evaluationRepository.save(any())).thenReturn(evaluation);
+
+        EvaluationDTO updatedEvaluation = evaluationService.updateEvaluation(evaluationDTO);
+
+        assertNotNull(updatedEvaluation);
+        assertEquals(evaluation.getScore(), updatedEvaluation.getScore());
+    }
 
 }

@@ -3,10 +3,13 @@ package com.matmic.cookbook.controller;
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
 import com.matmic.cookbook.dto.CommentDTO;
 import com.matmic.cookbook.service.CommentService;
+import com.matmic.cookbook.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -24,10 +27,12 @@ public class CommentController {
 
     public static final String ENTITY_NAME = "comment";
     private final CommentService commentService;
+    private final UserService userService;
 
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, UserService userService) {
 
         this.commentService = commentService;
+        this.userService = userService;
     }
 
     /**
@@ -73,18 +78,28 @@ public class CommentController {
     }
 
     /**
-     * PUT /:id : update Comment with given id
+     * PUT  : update Comment with given id
      *
      * @param commentDTO comment to be saved
      * @return the ResponseEntity with status 200 OK and with body the updated commentDTO,
      * or with status 400 Bad Request if the commentDTO is not valid,
      * @throws URISyntaxException if the Comment Location URI syntax is incorrect
      */
-    @PutMapping("/{id}")
+    @PutMapping("/update")
     public ResponseEntity<CommentDTO> updateComment(@RequestBody CommentDTO commentDTO) throws URISyntaxException{
+        log.debug("REST request to update comment: {}", commentDTO);
         if (commentDTO.getId() == null){
             return createNewComment(commentDTO);
         }
+
+        Authentication principal = SecurityContextHolder.getContext().getAuthentication();
+        if (!commentDTO.getUserName().equals(principal.getName())){
+            if (!userService.checkIsAdmin(principal.getName())) {
+                return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "User not allowed to edit this comment."))
+                        .body(null);
+            }
+        }
+
         CommentDTO updatedComment = commentService.saveOrUpdateComment(commentDTO);
         return ResponseEntity.ok().headers(HttpHeadersUtil.updateEntityAlert(ENTITY_NAME, commentDTO.getId().toString()))
                 .body(updatedComment);

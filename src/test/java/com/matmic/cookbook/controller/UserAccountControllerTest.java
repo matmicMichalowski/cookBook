@@ -165,13 +165,15 @@ public class UserAccountControllerTest {
 
     @Test
     public void finishPasswordResetRequest() throws Exception {
+        String resetToken = "newToken";
+
         ResetTokenAndPasswordVM testResetVM = new ResetTokenAndPasswordVM();
         testResetVM.setNewPassword("newPass");
-        testResetVM.setResetToken("newToken");
+        testResetVM.setResetToken(resetToken);
 
         when(userService.completeResetPasswordRequest(anyString(), anyString())).thenReturn(Optional.of(user));
 
-        mockMvc.perform(post("/api/account/reset-password/complete")
+        mockMvc.perform(post("/api/account/reset-password/complete?token={resetToken}", resetToken)
                     .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                     .content(TestUtil.asJsonBytes(testResetVM)))
                 .andExpect(status().isOk());

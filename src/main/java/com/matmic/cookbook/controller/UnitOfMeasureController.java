@@ -52,7 +52,7 @@ public class UnitOfMeasureController {
      */
     @PostMapping("/unit/new")
     @Secured("ADMIN")
-    public ResponseEntity<UnitOfMeasureDTO> createNeUnitOfMeasure(@RequestBody UnitOfMeasureDTO newUom)
+    public ResponseEntity<UnitOfMeasureDTO> createNewUnitOfMeasure(@RequestBody UnitOfMeasureDTO newUom)
             throws URISyntaxException{
         log.debug("REST request to create and save new UnitOfMeasure entity");
         if (newUom.getId() != null){
@@ -72,7 +72,7 @@ public class UnitOfMeasureController {
      * @param id id of the unit
      * @return the ResponseEntity with status 200 OK and unitOfMeasure in body
      */
-    @GetMapping("/unit/{id}")
+    @GetMapping("/unit/by-id/{id}")
     public ResponseEntity<UnitOfMeasureDTO> getUnitById(@PathVariable Long id){
         log.debug("REST request to get UnitOfMeasure by id: {}", id);
         return new ResponseEntity<>(uomService.findUnitById(id), HttpStatus.OK);
@@ -85,8 +85,8 @@ public class UnitOfMeasureController {
      * @param name name of unit
      * @return the ResponseEntity with status 200 OK and unitOfMeasure in body
      */
-    @GetMapping("/unit/{name}")
-    public ResponseEntity<UnitOfMeasureDTO> getUnitById(@PathVariable String name){
+    @GetMapping("/unit/by-name/{name}")
+    public ResponseEntity<UnitOfMeasureDTO> getUnitByName(@PathVariable String name){
         log.debug("REST request to get UnitOfMeasure by name: {}", name);
         return new ResponseEntity<>(uomService.findUnitByName(name), HttpStatus.OK);
     }

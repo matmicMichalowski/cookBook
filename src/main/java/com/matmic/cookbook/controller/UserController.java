@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * REST controller for managing User
+ */
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -59,8 +62,17 @@ public class UserController {
         return "ok";
     }
 
+    /**
+     * POST /user : create new User
+     * @param userVM user view model
+     * @param request Http Request
+     * @return the ResponseEntity with status 201 Created and with body the new user, or with status 400 Bad Request
+     * if the login or email is already in use
+     * @throws URISyntaxException if the User Location URI syntax is incorrect
+     */
     @PostMapping("/user")
-    public ResponseEntity createUser(@Valid @RequestBody UserVM userVM) throws URISyntaxException{
+    @Secured("ADMIN")
+    public ResponseEntity createUser(@Valid @RequestBody UserVM userVM, HttpServletRequest request) throws URISyntaxException{
         log.debug("REST request to save new User: {}", userVM);
 
         if (userVM.getId() != null){
@@ -73,13 +85,24 @@ public class UserController {
                     .body(null);
         }else{
             User newUser = userService.createUser(userVM);
-            //emailService.activationEmail(newUser);
+            String applicationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            Mail mail = new Mail(newUser.getEmail(), newUser.getName(), "Account Activation", "activationEmail",
+                    applicationUrl + "/api/activate?token=" + newUser.getActivationToken());
+            emailService.sendEmailMessage(mail);
             return ResponseEntity.created(new URI("/api/user/" + newUser.getName()))
                     .headers(HttpHeadersUtil.createdEntityAlert(ENTITY_NAME, newUser.getName()))
                     .body(newUser);
         }
     }
 
+    /**
+     * PUT  /user : Updates an existing User
+     *
+     * @param userDTO the user to update
+     * @return the ResponseEntity with status 200 OK and with body the updated user,
+     * or with status 400 Bad Request if the login or email is already in use,
+     * or with status 500 Internal Server Error if the user couldn't be updated
+     */
     @PutMapping("/user")
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO){
         log.debug("REST request to update User: {}", userDTO);
@@ -98,6 +121,12 @@ public class UserController {
                 .body(updatedUser);
     }
 
+    /**
+     * GET  /users : get all users
+     *
+     * @param pageable the pagination information
+     * @return the ResponseEntity with status 200 OK and with body all users
+     */
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers(Pageable pageable){
         log.debug("REST request for all Users");
@@ -106,18 +135,35 @@ public class UserController {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-
+    /**
+     * GET /user/:id/recipes : get all user recipes
+     *
+     * @param id the id of the user
+     * @return list of user's recipe list
+     */
     @GetMapping("/user/{id}/recipes")
     public ResponseEntity<List<RecipeDTO>> findUserRecipes(@PathVariable String id){
+        log.debug("REST request to get user recipe list : {}", id);
         return new ResponseEntity<>(userService.findUserRecipes(Long.valueOf(id)), HttpStatus.OK);
     }
 
+    /**
+     * GET  /users/:id : get the user by id
+     *
+     * @param id the id of the user to find
+     * @return the ResponseEntity with status 200 OK and with body the userDTO
+     */
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable Long id){
         log.debug("REST request to get User: {}", id);
         return ResponseEntity.ok(userService.findUserDTOByID(id));
     }
 
+    /**
+     * GET /user/authentication : get all authorities
+     *
+     * @return list of string of all the roles
+     */
     @GetMapping("/user/authorities")
     @Secured("ADMIN")
     public List<String> getAuthorities(){

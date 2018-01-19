@@ -75,7 +75,7 @@ public class IngredientServiceImpl implements IngredientService {
                     .filter(ingredient -> ingredient.getId().equals(id))
                     .findFirst()
                     .map(toIngredientDto::convert)
-                    .orElseThrow(RuntimeException::new);
+                    .orElseThrow(NullPointerException::new);
         }
         return null;
     }

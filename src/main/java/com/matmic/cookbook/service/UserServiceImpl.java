@@ -25,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service Implementation for managing User
+ */
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -52,6 +55,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    /**
+     * Get all User evaluations
+     *
+     * @param userId the id of user
+     * @return list of user evaluationDTO
+     */
     @Override
     public List<EvaluationDTO> findUserEvaluations(Long userId) {
         return findUserByID(userId).getEvaluations().stream()
@@ -59,11 +68,23 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get all users
+     *
+     * @param pageable pagination information
+     * @return list of entities
+     */
     @Override
     public Page<UserDTO> findAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable).map(toUserDto::convert);
     }
 
+    /**
+     * Activation user account
+     *
+     * @param activationToken token to enable activation
+     * @return optional of user with activated account
+     */
     @Override
     public Optional<User> activateUser(String activationToken) {
         return userRepository.findOneByActivationToken(activationToken)
@@ -74,6 +95,11 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
+    /**
+     * Request to generate email with reset password token
+     * @param userEmail user email
+     * @return optional of user entity found by email
+     */
     @Override
     public Optional<User> resetPasswordRequest(String userEmail) {
         return userRepository.findOneByEmail(userEmail).filter(User::isActive)
@@ -83,6 +109,13 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
+    /**
+     * Complete reset password request
+     *
+     * @param newPassword new password
+     * @param resetToken reset password token
+     * @return optional of user entity
+     */
     @Override
     public Optional<User> completeResetPasswordRequest(String newPassword, String resetToken) {
         return userRepository.findOneByResetToken(resetToken)
@@ -93,6 +126,11 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
+    /**
+     * Change password
+     *
+     * @param password new password
+     */
     @Override
     public void changePassword(String password) {
         userRepository.findUserByName(SecurityUtil.getCurrentUser()).ifPresent(
@@ -102,7 +140,12 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-
+    /**
+     * Create new User
+     *
+     * @param userVM user View Model to create new User
+     * @return created and saved User
+     */
     @Override
     public User createUser(UserVM userVM) {
         User newUser = new User();
@@ -123,6 +166,14 @@ public class UserServiceImpl implements UserService {
         return newUser;
     }
 
+    /**
+     * Create new User
+     *
+     * @param name user name
+     * @param email user email
+     * @param password user password
+     * @return created and saved User
+     */
     @Override
     public User createUser(String name, String email, String password) {
         User user = new User();
@@ -141,6 +192,12 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    /**
+     * Update existing User
+     *
+     * @param userDTO entity to be updated
+     * @return updated userDTO
+     */
     @Override
     public UserDTO updateUser(UserDTO userDTO) {
         Optional<User> optional = userRepository.findById(userDTO.getId());
@@ -153,6 +210,12 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    /**
+     * Get UserDTO by Id
+     *
+     * @param id entity id
+     * @return userDTO found
+     */
     @Override
     public UserDTO findUserDTOByID(Long id) {
         Optional<User> optional = userRepository.findById(id);
@@ -165,6 +228,12 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    /**
+     * Get all User recipes
+     *
+     * @param userId user id
+     * @return list of all user recipes
+     */
     @Override
     public List<RecipeDTO> findUserRecipes(Long userId){
         return findUserByID(userId).getRecipes().stream()
@@ -172,6 +241,12 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get User by username
+     *
+     * @param username user login(username)
+     * @return user found
+     */
     @Override
     public UserDTO findUserByUsername(String username) {
         Optional<User> optional = userRepository.findUserByName(username);
@@ -182,17 +257,44 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    /**
+     * Get all authorities
+     *
+     * @return list of all authorities
+     */
     @Override
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
     }
 
+    /**
+     * Get User with authorities
+     *
+     * @return user found, or null
+     */
     @Override
     public User getUserWithAuthorities() {
         return userRepository.findOneWithAuthoritiesByName(SecurityUtil.getCurrentUser()).orElse(null);
     }
 
+    /**
+     * Check if User is ADMIN
+     *
+     * @param username user login(username)
+     * @return true if user have ADMIN authority
+     */
+    @Override
+    public boolean checkIsAdmin(String username){
+        UserDTO user = findUserByUsername(username);
+        return user.getAuthorities().contains(AuthoritiesConstants.ADMIN);
+    }
 
+    /**
+     * Get User by id
+     *
+     * @param id user id
+     * @return user found
+     */
     @Override
     public User findUserByID(Long id) {
         Optional<User> user = userRepository.findById(id);
@@ -202,6 +304,11 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    /**
+     * Delete User by id
+     *
+     * @param id user id
+     */
     @Override
     public void deleteUser(Long id) {
         User userToDelete = findUserByID(id);

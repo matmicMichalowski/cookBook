@@ -105,6 +105,7 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
         comment.getUser().getComments().add(comment);
         comment.setRecipe(recipe);
         comment.getRecipe().getComments().add(comment);
+        comment.setUserName("Jhonatan");
         comment.setComment("Test Comment");
         commentRepository.saveAndFlush(comment);
 

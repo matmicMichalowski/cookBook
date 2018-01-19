@@ -74,7 +74,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
         log.debug("Request to get one UnitOfMeasure by name: {}", name);
         return uomRepository.findUnitOfMeasureByName(name)
                 .map(toUnitOfMeasureDto::convert)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(NullPointerException::new);
     }
 
     /**
@@ -89,7 +89,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
         log.debug("Request to get one UnitOfMeasure by id: {}", id);
         return uomRepository.findById(id)
                 .map(toUnitOfMeasureDto::convert)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(NullPointerException::new);
     }
 
     /**

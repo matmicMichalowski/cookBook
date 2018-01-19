@@ -14,7 +14,7 @@ public class RatingDTO {
 
     private Long id;
     private int evaluationSum;
-    private double totalRating;
+    private String totalRating;
     private Set<EvaluationDTO> usersEvaluations = new HashSet<>();
     private Long recipeId;
 }

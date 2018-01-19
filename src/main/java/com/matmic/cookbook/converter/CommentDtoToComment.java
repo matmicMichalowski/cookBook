@@ -36,8 +36,10 @@ public class CommentDtoToComment implements Converter<CommentDTO, Comment>{
             user.setId(commentDTO.getUserId());
             comment.setUser(user);
             user.getComments().add(comment);
+
         }
 
+        comment.setUserName(commentDTO.getUserName());
 
         return comment;
     }

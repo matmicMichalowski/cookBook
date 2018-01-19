@@ -47,7 +47,7 @@ public class RatingServiceImplTest {
     }
 
     @Test
-    public void saveAndUpdateRating() throws Exception {
+    public void updateRatingNewEvaluation() throws Exception {
 
         Recipe recipe = new Recipe();
         recipe.setId(4L);
@@ -68,7 +68,7 @@ public class RatingServiceImplTest {
         when(ratingRepository.findById(anyLong())).thenReturn(Optional.of(rating));
         when(ratingRepository.save(any())).thenReturn(rating);
 
-        RatingDTO saved = ratingService.saveAndUpdateRating(evaluation);
+        RatingDTO saved = ratingService.updateRating(evaluation);
 
         assertNotNull(saved);
         assertEquals(19, saved.getEvaluationSum());
@@ -104,7 +104,7 @@ public class RatingServiceImplTest {
         when(ratingRepository.findById(anyLong())).thenReturn(Optional.of(rating));
         when(ratingRepository.save(any())).thenReturn(rating);
 
-        RatingDTO saved = ratingService.saveAndUpdateRating(evaluation);
+        RatingDTO saved = ratingService.updateRating(evaluation);
 
         assertNotNull(saved);
         assertEquals(1, saved.getUsersEvaluations().size());

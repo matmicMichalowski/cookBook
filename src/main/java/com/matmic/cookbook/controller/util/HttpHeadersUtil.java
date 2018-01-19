@@ -22,6 +22,7 @@ public final class HttpHeadersUtil {
         return createAlertHeader("A " + entityName + " is updated with id " + param, param);
     }
 
+
     public static HttpHeaders deleteEntityAlert(String entityName, String param){
         return createAlertHeader("A " + entityName + " is deleted with id " + param, param);
     }
@@ -32,4 +33,5 @@ public final class HttpHeadersUtil {
         headers.add("X-cookbookApp-param", entityName);
         return headers;
     }
+
 }

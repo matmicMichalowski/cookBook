@@ -1,6 +1,5 @@
 package com.matmic.cookbook.controller;
 
-import com.matmic.cookbook.CookbookApplication;
 import com.matmic.cookbook.controller.errors.RestResponseEntityExceptionHandler;
 import com.matmic.cookbook.converter.CommentDtoToComment;
 import com.matmic.cookbook.converter.CommentToCommentDto;
@@ -11,14 +10,15 @@ import com.matmic.cookbook.dto.CommentDTO;
 import com.matmic.cookbook.repository.CommentRepository;
 import com.matmic.cookbook.service.CommentService;
 import com.matmic.cookbook.service.CommentServiceImpl;
+import com.matmic.cookbook.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -34,14 +34,16 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = CookbookApplication.class)
+
 public class CommentControllerTest {
 
     private final String TEST_COMMENT = "TestComment";
 
     @Mock
     private CommentService commentService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private CommentRepository commentRepository;
@@ -54,9 +56,12 @@ public class CommentControllerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        Authentication auth = new UsernamePasswordAuthenticationToken("UserTest", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         commentService = new CommentServiceImpl(commentRepository, new CommentToCommentDto(), new CommentDtoToComment());
 
-        final CommentController controller = new CommentController(commentService);
+        final CommentController controller = new CommentController(commentService, userService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new RestResponseEntityExceptionHandler())
                 .build();
@@ -124,9 +129,11 @@ public class CommentControllerTest {
 
     @Test
     public void updateComment() throws Exception {
+
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setId(1L);
         commentDTO.setComment(TEST_COMMENT);
+        commentDTO.setUserName("UserTest");
         commentDTO.setRecipeId(2L);
         commentDTO.setUserId(3L);
 
@@ -134,6 +141,7 @@ public class CommentControllerTest {
         CommentDTO commentSaved = new CommentDTO();
         commentSaved.setId(1L);
         commentSaved.setComment(commentDTO.getComment());
+        commentSaved.setUserName("UserTest");
         commentSaved.setRecipeId(commentDTO.getRecipeId());
         commentSaved.setUserId(commentDTO.getUserId());
 
@@ -141,12 +149,11 @@ public class CommentControllerTest {
         when(commentRepository.save(any())).thenReturn(comment);
         when(commentService.saveOrUpdateComment(commentDTO)).thenReturn(commentSaved);
 
-        mockMvc.perform(put("/api/comment/1")
+        mockMvc.perform(put("/api/comment/update")
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(asJsonBytes(commentDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.comment").value(commentSaved.getComment()));
-
     }
 
 

@@ -21,6 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Optional;
 
+/**
+ * REST controller for managing UserAccount
+ */
 @RestController
 @RequestMapping("/api")
 public class UserAccountController {
@@ -38,6 +41,14 @@ public class UserAccountController {
         this.emailService = emailService;
     }
 
+    /**
+     * POST /register : register new user account
+     *
+     * @param userVM managed user View Model
+     * @param request Http request
+     * @return ResponseEntity with status 201 Created if the user is registered 400 BadRequest if the login or email
+     * is in use
+     */
     @PostMapping(path = "/register", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity registerNewUserAccount(@Valid @RequestBody UserVM userVM, HttpServletRequest request){
         String applicationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -60,36 +71,71 @@ public class UserAccountController {
                     log.debug("User created with id: {}", user.getId());
                     return new ResponseEntity<>(HttpStatus.CREATED);
                 }));
-
     }
 
+    /**
+     * Password length validation
+     *
+     * @param password password to be checked
+     * @return true if password length is valid
+     */
     private boolean checkPasswordLen(String password){
         return !password.isEmpty() &&
                 password.length() >= 5 &&
                 password.length() <= 100;
     }
 
+    /**
+     * GET /activate : activate user account
+     *
+     * @param activationToken the activation token
+     * @return ResponseEntity with status 200 OK and body with activated user,
+     * or status 500 Internal Server Error if user could not be activated
+     */
     @GetMapping("/activate")
     public ResponseEntity<String> userAccountActivation(@RequestParam("token") String activationToken){
+        log.debug("REST request to activate user account with token: {}", activationToken);
         return userService.activateUser(activationToken)
                 .map(user -> new ResponseEntity<String>(HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
+    /**
+     * GET /account : get current account
+     *
+     * @return ResponseEntity with status 200 OK and the body with current userDTO,
+     * or status 500 Internal Server Error if user could not be returned
+     */
     @GetMapping("/account")
     public ResponseEntity<UserDTO> getAccount(){
+        log.debug("REST request to get actual user");
         return Optional.ofNullable(userService.getUserWithAuthorities()).map(user -> new ResponseEntity<>(new UserDTO(user), HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
+    /**
+     * GET /authenticate : check if user is authenticated and return it's login
+     *
+     * @param request Http request
+     * @return login if the user is authenticated
+     */
     @GetMapping("/authenticate")
     public String isAuthenticated(HttpServletRequest request){
         log.debug("REST request to check if current user is authenticated");
         return request.getRemoteUser();
     }
 
+    /**
+     * POST /account : update and save user
+     *
+     * @param userDTO userDTO to be updated
+     * @return ResponseEntity with status 200 OK,
+     * or status 400 Bad Request if new email is in use,
+     * or 500 Internal Server Error if the user could not be updated
+     */
     @PostMapping("/account")
     public ResponseEntity updateAndSaveAccount(@Valid @RequestBody UserDTO userDTO){
+        log.debug("REST request to update userDTO : {}", userDTO);
         final String userLogin = SecurityUtil.getCurrentUser();
         Optional<User> checkIfExists = userRepository.findOneByEmail(userDTO.getEmail());
         if (checkIfExists.isPresent() && (!checkIfExists.get().getName().equalsIgnoreCase(userLogin))){
@@ -104,8 +150,16 @@ public class UserAccountController {
                 .orElseGet(()-> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
+    /**
+     * POST /account/change-password : changes the current user's password
+     *
+     * @param password new password to be saved
+     * @return ResponseEntity with status 200 OK,
+     * or status 400 Bad Request if the new password in invalid
+     */
     @PostMapping(path = "/account/change-password", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity changePassword(@RequestBody String password){
+        log.debug("REST request to change password");
         if (!checkPasswordLen(password)){
             return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
         }
@@ -113,8 +167,16 @@ public class UserAccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * POST /account/reset-password/request : send email to reset the password
+     *
+     * @param email user email
+     * @param request Http request
+     * @return
+     */
     @PostMapping(path = "/account/reset-password/request", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity resetPasswordRequest(@RequestBody String email, HttpServletRequest request){
+        log.debug("REST request to initialize reset password: {}", email);
         return userService.resetPasswordRequest(email)
                 .map(user -> {
                     String applicationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -125,8 +187,18 @@ public class UserAccountController {
                 }).orElse(new ResponseEntity<>("email address not found", HttpStatus.BAD_REQUEST));
     }
 
+    /**
+     * POST /account/reset-password/complete : change user password
+     *
+     * @param resetToken reset password token from email received by user
+     * @param password new password
+     * @return ResponseEntity with status 200 OK if password has been reset,
+     * or status 400 Bad Request if password is incorrect,
+     * or status 500 Internal Server Error if password could not ben saved
+     */
     @PostMapping(path = "/account/reset-password/complete")
     public ResponseEntity<String> finishPasswordResetRequest(@RequestParam("token") String resetToken, @RequestBody String password){
+        log.debug("REST request to finish reset password request");
         if (!checkPasswordLen((password))){
             return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
         }

@@ -24,6 +24,7 @@ public class CommentToCommentDto implements Converter<Comment, CommentDTO>{
         commentDTO.setComment(comment.getComment());
         commentDTO.setRecipeId(comment.getRecipe().getId());
         commentDTO.setUserId(comment.getUser().getId());
+        commentDTO.setUserName(comment.getUserName());
 
         return commentDTO;
     }

@@ -79,7 +79,7 @@ public class CommentServiceImpl implements CommentService {
         log.debug("Request to get Comment by id: {} and User Id: {}", commentId, userId);
         return findCommentsByUser(userId).stream()
                 .filter(comment -> comment.getId().equals(commentId))
-                .findFirst().orElseThrow(RuntimeException::new);
+                .findFirst().orElseThrow(NullPointerException::new);
     }
 
     /**

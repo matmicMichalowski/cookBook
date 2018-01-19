@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface RatingService {
 
-    RatingDTO saveAndUpdateRating(EvaluationDTO evaluationDTO);
+    RatingDTO updateRating(EvaluationDTO evaluationDTO);
     RatingDTO findRatingByRecipe(Long recipeId);
     Set<EvaluationDTO> findRatingEvaluations(Long ratingId);
 }

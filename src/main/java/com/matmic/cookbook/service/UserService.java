@@ -27,6 +27,7 @@ public interface UserService {
     List<RecipeDTO> findUserRecipes(Long userId);
     UserDTO findUserByUsername(String username);
     List<String> getAuthorities();
+    boolean checkIsAdmin(String username);
     User getUserWithAuthorities();
     void deleteUser(Long id);
 

@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,9 +24,15 @@ public class Recipe implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty
+    @Size(min = 3, max = 100)
     private String name;
+
     private int cookTime;
+
+    @Min(1)
     private int servings;
+
     private Difficulty difficulty;
 
     @OneToOne(mappedBy = "recipe", cascade = CascadeType.ALL)
@@ -31,6 +40,7 @@ public class Recipe implements Serializable {
     private Rating rating;
 
     @Lob
+    @NotEmpty
     private String directions;
 
 

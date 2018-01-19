@@ -9,5 +9,7 @@ public interface EvaluationService {
 
     List<EvaluationDTO> getEvaluations();
     EvaluationDTO findEvaluationById(Long evaluationId);
+    EvaluationDTO saveNewEvaluation(EvaluationDTO evaluationDTO);
+    EvaluationDTO updateEvaluation(EvaluationDTO evaluationDTO);
     List<EvaluationDTO> evaluationsByUser(Long userId);
 }

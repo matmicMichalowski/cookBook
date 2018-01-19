@@ -26,6 +26,10 @@ public class Comment implements Serializable {
     @Size(min = 5, max = 500)
     private String comment;
 
+
+    @Size(min = 1, max = 50)
+    private String userName;
+
     @ManyToOne
     @NotNull
     @JsonBackReference
