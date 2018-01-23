@@ -1,7 +1,8 @@
 package com.matmic.cookbook.controller;
 
 import com.matmic.cookbook.controller.errors.RestResponseEntityExceptionHandler;
-import com.matmic.cookbook.converter.RecipeToRecipeDto;
+import com.matmic.cookbook.converter.*;
+import com.matmic.cookbook.domain.Difficulty;
 import com.matmic.cookbook.domain.Rating;
 import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
@@ -12,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -27,9 +27,8 @@ import static com.matmic.cookbook.controller.TestUtil.asJsonBytes;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class RecipeControllerTest {
@@ -40,7 +39,7 @@ public class RecipeControllerTest {
     @Mock
     private IngredientService ingredientService;
 
-    @Autowired
+
     private RecipeToRecipeDto toRecipeDto;
 
     private MockMvc mockMvc;
@@ -50,6 +49,9 @@ public class RecipeControllerTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        toRecipeDto = new RecipeToRecipeDto(new RatingToRatingDto(new EvaluationToEvaluationDto()), new CategoryToCategoryDto(),
+                new IngredientToIngredientDto(new UnitOfMeasureToUnitOfMeasureDto()), new CommentToCommentDto());
 
         final RecipeController controller = new RecipeController(recipeService, ingredientService);
 
@@ -62,10 +64,16 @@ public class RecipeControllerTest {
         recipe.setId(1L);
         recipe.setUser(new User());
         recipe.getUser().setId(2L);
+        recipe.getUser().getRecipes().add(recipe);
+        recipe.setDifficulty(Difficulty.MODERATE);
+        recipe.setUserName("Tester");
+        recipe.setServings(2);
         recipe.setName("TestyPizza");
         recipe.setDirections("Test directions");
         recipe.setRating(new Rating());
         recipe.getRating().setId(1L);
+        recipe.getRating().setRecipe(recipe);
+
     }
 
     @Test
@@ -99,11 +107,14 @@ public class RecipeControllerTest {
 
         RecipeDTO recipeDTO = toRecipeDto.convert(recipe);
 
+        RecipeDTO toSave = toRecipeDto.convert(recipe);
+        toSave.setId(null);
+
         when(recipeService.createNewRecipe(any(), anyLong())).thenReturn(recipeDTO);
 
-        mockMvc.perform(post("/api/recipe")
+        mockMvc.perform(post("/api/user/1/recipe")
                     .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                    .content(asJsonBytes(recipeDTO)))
+                    .content(asJsonBytes(toSave)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(recipe.getName()))
                 .andExpect(jsonPath("$.directions").value(recipe.getDirections()));
@@ -111,10 +122,27 @@ public class RecipeControllerTest {
 
     @Test
     public void updateRecipe() throws Exception {
+
+        RecipeDTO recipeToUpdate = toRecipeDto.convert(recipe);
+
+        when(recipeService.saveAndUpdateRecipe(any())).thenReturn(recipeToUpdate);
+
+        mockMvc.perform(put("/api/user/1/recipe")
+                    .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                    .content(asJsonBytes(recipeToUpdate)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(recipe.getName()))
+                .andExpect(jsonPath("$.directions").value(recipe.getDirections()));
     }
 
     @Test
     public void deleteRecipe() throws Exception {
+
+        mockMvc.perform(delete("/api/recipe/3")
+                    .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(status().isOk());
+
+        verify(recipeService, times(1)).deleteRecipe(anyLong());
     }
 
 }

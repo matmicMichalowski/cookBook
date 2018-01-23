@@ -13,6 +13,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +57,12 @@ public class EvaluationServiceImplTest {
         List<Evaluation> evaluations = new ArrayList<>();
         evaluations.add(ev);
 
-        when(evaluationRepository.findAll()).thenReturn(evaluations);
+        Page<Evaluation> evaluationPage = new PageImpl<>(evaluations);
 
-        Page<EvaluationDTO> evaluationDTOList = evaluationService.getEvaluations(any());
+        Pageable pageable = PageRequest.of(0, 2);
+        when(evaluationRepository.findAll(pageable)).thenReturn(evaluationPage);
+
+        Page<EvaluationDTO> evaluationDTOList = evaluationService.getEvaluations(pageable);
 
         assertNotNull(evaluationDTOList);
         assertEquals(1, evaluationDTOList.getTotalElements());

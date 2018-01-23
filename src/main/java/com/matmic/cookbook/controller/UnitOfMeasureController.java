@@ -44,7 +44,7 @@ public class UnitOfMeasureController {
     @GetMapping("/units")
     public ResponseEntity<List<UnitOfMeasureDTO>> getAllUnits(Pageable pageable){
         log.debug("REST request to get all Units");
-        Page<UnitOfMeasureDTO> page = uomService.findAllUoms(pageable);
+        Page<UnitOfMeasureDTO> page = uomService.getUomList(pageable);
         HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/units");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

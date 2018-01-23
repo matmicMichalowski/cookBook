@@ -10,6 +10,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,6 @@ public class UnitOfMeasureServiceImplTest {
 
     @Mock
     private UnitOfMeasureRepository uomRepository;
-
 
     private UnitOfMeasureToUnitOfMeasureDto toUnitOfMeasureDto = new UnitOfMeasureToUnitOfMeasureDto();
 
@@ -48,16 +50,21 @@ public class UnitOfMeasureServiceImplTest {
     }
 
     @Test
-    public void getUoMList() throws Exception {
+    public void getUomList() throws Exception {
         List<UnitOfMeasure> uomList = new ArrayList<>();
         uomList.add(uom);
-        when(uomRepository.findAll()).thenReturn(uomList);
 
-        Page<UnitOfMeasureDTO> unitsFound = unitOfMeasureService.findAllUoms(any());
+        Page<UnitOfMeasure> unitPage = new PageImpl<>(uomList);
+
+        Pageable pageable = PageRequest.of(0, 4);
+
+        when(uomRepository.findAll(pageable)).thenReturn(unitPage);
+
+        Page<UnitOfMeasureDTO> unitsFound = unitOfMeasureService.getUomList(pageable);
 
         assertNotNull(unitsFound);
         assertEquals(1, unitsFound.getTotalElements());
-        verify(uomRepository, times(1)).findAll();
+        verify(uomRepository, times(1)).findAll(pageable);
     }
 
     @Test

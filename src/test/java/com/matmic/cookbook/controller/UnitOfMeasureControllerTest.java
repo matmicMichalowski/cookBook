@@ -32,7 +32,6 @@ public class UnitOfMeasureControllerTest {
 
     private MockMvc mockMvc;
 
-
     private UnitOfMeasure unitOfMeasure;
 
     @Before
@@ -61,7 +60,7 @@ public class UnitOfMeasureControllerTest {
         units.add(unitOfMeasureDTO);
         Page<UnitOfMeasureDTO> page = new PageImpl<>(units);
 
-        when(uomService.findAllUoms(any())).thenReturn(page);
+        when(uomService.getUomList(any())).thenReturn(page);
 
         mockMvc.perform(get("/api/units?page=0&size=2"))
                 .andExpect(status().isOk())

@@ -14,6 +14,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,9 +79,12 @@ public class CommentServiceImplTest {
         comments.add(comment1);
         comments.add(comment2);
 
-        when(commentRepository.findAll()).thenReturn(comments);
+        Page<Comment> commentPage = new PageImpl<>(comments);
 
-        Page<CommentDTO> commentDTOList = commentService.getAllComments(any());
+        Pageable pageable = PageRequest.of(0, 4);
+        when(commentRepository.findAll(pageable)).thenReturn(commentPage);
+
+        Page<CommentDTO> commentDTOList = commentService.getAllComments(pageable);
 
         assertNotNull(commentDTOList);
         assertEquals(2, commentDTOList.getTotalElements());

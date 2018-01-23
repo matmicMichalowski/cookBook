@@ -31,6 +31,7 @@ import java.util.Optional;
 
 import static com.matmic.cookbook.controller.TestUtil.asJsonBytes;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -118,6 +119,9 @@ public class CommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].comment").value(hasItem(TEST_COMMENT)));
+
+        assertEquals(1, page.getTotalElements());
+
     }
 
     @Test

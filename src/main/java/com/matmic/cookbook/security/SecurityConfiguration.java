@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.PostConstruct;
@@ -74,52 +75,53 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
-        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable().headers()
-        .frameOptions().disable();
+//        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable().headers()
+//        .frameOptions().disable();
 
-//        http
-//                .csrf().disable()
-////                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-////       .and()
-//             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-//             .exceptionHandling()
-//             .authenticationEntryPoint(unauthorizedEntryPointHttp401())
+        http
+                .csrf().disable()
+//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //       .and()
-//              .headers()
-//                .frameOptions()
-//                .disable()
-//       .and()
-//              .authorizeRequests()
-//              .antMatchers("/api/login").permitAll()
-//              .antMatchers("/api/ok").permitAll()
-//              .antMatchers("/api/activate").permitAll()
-//              .antMatchers("/api/register").permitAll()
-//              .antMatchers("/api/authenticate").permitAll()
-//              .antMatchers("/api/authentication").permitAll()
-//              .antMatchers("/api/registration").permitAll()
-//              .antMatchers("/api/reset-password").permitAll()
-//              .antMatchers("/api/reset").permitAll()
-//              .antMatchers("/400error").permitAll()
-//              .antMatchers(HttpMethod.GET, "/api/recipes").permitAll()
-//              .antMatchers(HttpMethod.GET, "/api/recipe/**").permitAll()
-//              .antMatchers(HttpMethod.POST, "/api/user").hasAuthority(AuthoritiesConstants.ADMIN)
-//              .antMatchers(HttpMethod.POST, "/api/comment**").authenticated()
-//              .antMatchers(HttpMethod.PUT, "/api/comment**").authenticated()
-//              .antMatchers("/api/ingredient**").authenticated()
-//              .antMatchers("/api/**").authenticated()
-//       .and()
-//              .formLogin()
-//              .loginProcessingUrl("/api/authentication")
-//              .successHandler(authenticationSuccessHandler())
-//              .failureHandler(authenticationFailureHandler())
-//              .usernameParameter("username")
-//              .passwordParameter("password")
-//              .permitAll()
-//        .and()
-//                .logout()
-//                .logoutUrl("/api/logout")
-//                .logoutSuccessHandler(appLogoutSuccessHandler())
-//                .permitAll();
+             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+             .exceptionHandling()
+             .authenticationEntryPoint(unauthorizedEntryPointHttp401())
+       .and()
+              .headers()
+                .frameOptions()
+                .disable()
+       .and()
+              .authorizeRequests()
+              .antMatchers("/api/login").permitAll()
+              .antMatchers("/api/ok").permitAll()
+              .antMatchers("/api/activate").permitAll()
+              .antMatchers("/api/register").permitAll()
+              .antMatchers("/api/authenticate").permitAll()
+              .antMatchers("/api/authentication").permitAll()
+              .antMatchers("/api/registration").permitAll()
+              .antMatchers("/api/reset-password").permitAll()
+              .antMatchers("/api/reset").permitAll()
+              .antMatchers("/400error").permitAll()
+              .antMatchers(HttpMethod.GET, "/api/recipes").permitAll()
+              .antMatchers(HttpMethod.GET, "/api/recipe/**").permitAll()
+              .antMatchers(HttpMethod.GET, "/api/comment/**").permitAll()
+              .antMatchers(HttpMethod.POST, "/api/user").hasAuthority(AuthoritiesConstants.ADMIN)
+              .antMatchers(HttpMethod.POST, "/api/comment**").authenticated()
+              .antMatchers(HttpMethod.PUT, "/api/comment**").authenticated()
+              .antMatchers("/api/ingredient**").authenticated()
+              .antMatchers("/api/**").authenticated()
+       .and()
+              .formLogin()
+              .loginProcessingUrl("/api/authentication")
+              .successHandler(authenticationSuccessHandler())
+              .failureHandler(authenticationFailureHandler())
+              .usernameParameter("username")
+              .passwordParameter("password")
+              .permitAll()
+        .and()
+                .logout()
+                .logoutUrl("/api/logout")
+                .logoutSuccessHandler(appLogoutSuccessHandler())
+                .permitAll();
     }
 
     @Override

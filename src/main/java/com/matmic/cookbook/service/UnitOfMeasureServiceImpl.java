@@ -41,7 +41,7 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<UnitOfMeasureDTO> findAllUoms(Pageable pageable) {
+    public Page<UnitOfMeasureDTO> getUomList(Pageable pageable) {
         log.debug("Request to get all Units of Measure");
         return uomRepository.findAll(pageable).map(toUnitOfMeasureDto::convert);
     }
