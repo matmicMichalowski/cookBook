@@ -7,10 +7,13 @@ import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.CommentDTO;
 import com.matmic.cookbook.repository.CommentRepository;
+import com.matmic.cookbook.repository.RecipeRepository;
+import com.matmic.cookbook.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,12 @@ public class CommentServiceImplTest {
     @Mock
     private CommentRepository commentRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private RecipeRepository recipeRepository;
+
     private CommentToCommentDto toCommentDto = new CommentToCommentDto();
 
     private CommentDtoToComment toComment = new CommentDtoToComment();
@@ -36,7 +45,7 @@ public class CommentServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        commentService = new CommentServiceImpl(commentRepository, toCommentDto, toComment);
+        commentService = new CommentServiceImpl(commentRepository, toCommentDto, toComment, userRepository, recipeRepository);
     }
 
     @Test
@@ -69,10 +78,10 @@ public class CommentServiceImplTest {
 
         when(commentRepository.findAll()).thenReturn(comments);
 
-        List<CommentDTO> commentDTOList = commentService.getAllComments();
+        Page<CommentDTO> commentDTOList = commentService.getAllComments(any());
 
         assertNotNull(commentDTOList);
-        assertEquals(2, commentDTOList.size());
+        assertEquals(2, commentDTOList.getTotalElements());
     }
 
 

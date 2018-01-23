@@ -1,11 +1,11 @@
 package com.matmic.cookbook.service;
 
 import com.matmic.cookbook.dto.UnitOfMeasureDTO;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UnitOfMeasureService {
-    List<UnitOfMeasureDTO> getUoMList();
+    Page<UnitOfMeasureDTO> findAllUoms(Pageable pageable);
     UnitOfMeasureDTO save(UnitOfMeasureDTO unitOfMeasureDTO);
     UnitOfMeasureDTO findUnitByName(String name);
     UnitOfMeasureDTO findUnitById(Long id);

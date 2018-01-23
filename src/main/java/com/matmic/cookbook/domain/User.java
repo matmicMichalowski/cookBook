@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -50,24 +50,23 @@ public class User implements Serializable{
     private String resetToken;
 
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private Set<Recipe> recipes = new HashSet<>();
 
-    @JsonIgnore
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "recipe_comments", joinColumns = @JoinColumn(name="recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonBackReference
     private Set<Comment> comments = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private Set<Evaluation> evaluations = new HashSet<>();
 
-    @JsonIgnore
+
     @ManyToMany
     @JoinTable(name= "user_authority", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
                 inverseJoinColumns = {@JoinColumn(name = "authority_name" ,referencedColumnName = "name")})

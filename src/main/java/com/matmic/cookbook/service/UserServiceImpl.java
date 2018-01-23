@@ -150,12 +150,7 @@ public class UserServiceImpl implements UserService {
     public User createUser(UserVM userVM) {
         User newUser = new User();
 
-        if (userRepository.count() == 0){
-            newUser.getAuthorities().add(authorityRepository.findOneByName(AuthoritiesConstants.ADMIN));
-        }else{
-            newUser.getAuthorities().add(authorityRepository.findOneByName(AuthoritiesConstants.USER));
-        }
-
+        newUser.getAuthorities().add(authorityRepository.findOneByName(AuthoritiesConstants.ADMIN));
         String encryptedPassword = passwordEncoder.encode(userVM.getPassword());
         newUser.setPassword(encryptedPassword);
         newUser.setEmail(userVM.getEmail());
@@ -177,7 +172,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(String name, String email, String password) {
         User user = new User();
-        Authority authority = authorityRepository.findOneByName(AuthoritiesConstants.USER);
+        Authority authority;
+        if (userRepository.count() == 0){
+           authority = authorityRepository.findOneByName(AuthoritiesConstants.ADMIN);
+        }else{
+           authority =authorityRepository.findOneByName(AuthoritiesConstants.USER);
+        }
+
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         user.setName(name);

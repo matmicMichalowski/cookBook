@@ -10,12 +10,14 @@ import com.matmic.cookbook.dto.EvaluationDTO;
 import com.matmic.cookbook.repository.EvaluationRepository;
 import com.matmic.cookbook.repository.UserRepository;
 import com.matmic.cookbook.service.EvaluationService;
-import com.matmic.cookbook.service.EvaluationServiceImpl;
 import com.matmic.cookbook.service.RatingService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -60,12 +62,11 @@ public class EvaluationControllerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        evaluationService = new EvaluationServiceImpl(toEvaluationDto, toEvaluation, evaluationRepository, userRepository);
-
-        final EvaluationController controller = new EvaluationController(evaluationService, ratingService);
+        final EvaluationController controller = new EvaluationController(evaluationService, evaluationRepository, ratingService);
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new RestResponseEntityExceptionHandler())
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
 
         evaluation = new Evaluation();
@@ -80,10 +81,13 @@ public class EvaluationControllerTest {
     @Test
     public void getAllEvaluations() throws Exception {
 
-        List<Evaluation> evaluations = new ArrayList<>();
-        evaluations.add(evaluation);
+        List<EvaluationDTO> evaluations = new ArrayList<>();
+        EvaluationDTO evaluationDTO = toEvaluationDto.convert(evaluation);
+        evaluations.add(evaluationDTO);
 
-        when(evaluationRepository.findAll()).thenReturn(evaluations);
+        Page<EvaluationDTO> page = new PageImpl<>(evaluations);
+
+        when(evaluationService.getEvaluations(any())).thenReturn(page);
 
         mockMvc.perform(get("/api/evaluations"))
                 .andExpect(status().isOk())
@@ -94,7 +98,9 @@ public class EvaluationControllerTest {
     @Test
     public void getEvaluationById() throws Exception {
 
-        when(evaluationRepository.findById(anyLong())).thenReturn(Optional.of(evaluation));
+        EvaluationDTO evaluationDTO = toEvaluationDto.convert(evaluation);
+
+        when(evaluationService.findEvaluationById(anyLong())).thenReturn(evaluationDTO);
 
         mockMvc.perform(get("/api/evaluation/1"))
                 .andExpect(status().isOk())
@@ -117,10 +123,7 @@ public class EvaluationControllerTest {
         evaluationDTOSaved.setRatingId(evaluation.getRating().getId());
 
 
-        Evaluation evaluation = toEvaluation.convert(evaluationDTOSaved);
-
-
-        when(evaluationRepository.save(any())).thenReturn(evaluation);
+        when(evaluationService.saveNewEvaluation(any())).thenReturn(evaluationDTOSaved);
 
 
         mockMvc.perform(post("/api/evaluation")
@@ -142,8 +145,7 @@ public class EvaluationControllerTest {
 
         Evaluation evaluation = toEvaluation.convert(evaluationDTOUpdated);
 
-        when(evaluationRepository.findById(anyLong())).thenReturn(Optional.of(evaluation));
-        when(evaluationRepository.save(any())).thenReturn(evaluation);
+        when(evaluationService.updateEvaluation(any())).thenReturn(evaluationDTOUpdated);
 
         mockMvc.perform(put("/api/evaluation")
                     .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -179,10 +181,11 @@ public class EvaluationControllerTest {
 
     @Test
     public void getEvaluationsByUser() throws Exception {
-        User user = evaluation.getUser();
-        user.getEvaluations().add(evaluation);
+        List<EvaluationDTO> evaluations = new ArrayList<>();
+        EvaluationDTO evaluationDTO = toEvaluationDto.convert(evaluation);
+        evaluations.add(evaluationDTO);
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(evaluationService.evaluationsByUser(anyLong())).thenReturn(evaluations);
 
         mockMvc.perform(get("/api/evaluation/user/2"))
                 .andExpect(status().isOk())

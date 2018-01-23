@@ -154,9 +154,8 @@ public class RecipeServiceImpl implements RecipeService {
         if ( user == null){
             return null;
         }
+
         Recipe newRecipe = new Recipe();
-        newRecipe.setUser(user);
-        newRecipe.setUserName(user.getName());
         newRecipe.setName(recipeDTO.getName());
         newRecipe.setDifficulty(recipeDTO.getDifficulty());
         newRecipe.setDirections(recipeDTO.getDirections());
@@ -174,6 +173,8 @@ public class RecipeServiceImpl implements RecipeService {
             newRecipe.getIngredients().add(ingredient);
         });
 
+        newRecipe.setUser(user);
+        newRecipe.setUserName(user.getName());
         Recipe savedRecipe = recipeRepository.save(newRecipe);
 
         return toRecipeDto.convert(savedRecipe);

@@ -1,10 +1,14 @@
 package com.matmic.cookbook.controller;
 
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
+import com.matmic.cookbook.controller.util.PaginationUtil;
 import com.matmic.cookbook.dto.UnitOfMeasureDTO;
 import com.matmic.cookbook.service.UnitOfMeasureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -34,12 +38,15 @@ public class UnitOfMeasureController {
     /**
      * GET /units : get all UnitOfMeasure entities
      *
+     * @param pageable pagination information
      * @return list of all entities
      */
     @GetMapping("/units")
-    public ResponseEntity<List<UnitOfMeasureDTO>> getAllUnits(){
+    public ResponseEntity<List<UnitOfMeasureDTO>> getAllUnits(Pageable pageable){
         log.debug("REST request to get all Units");
-        return new ResponseEntity<>(uomService.getUoMList(), HttpStatus.OK);
+        Page<UnitOfMeasureDTO> page = uomService.findAllUoms(pageable);
+        HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/units");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
     /**

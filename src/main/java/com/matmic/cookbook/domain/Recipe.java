@@ -25,7 +25,7 @@ public class Recipe implements Serializable {
     private Long id;
 
     @NotEmpty
-    @Size(min = 3, max = 100)
+    @Size(min = 2, max = 100)
     private String name;
 
     private int cookTime;
@@ -54,7 +54,7 @@ public class Recipe implements Serializable {
     private Set<Category> categories = new HashSet<>();
 
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 

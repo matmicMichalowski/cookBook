@@ -8,6 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,6 +43,7 @@ public class UnitOfMeasureControllerTest {
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new RestResponseEntityExceptionHandler())
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
 
         unitOfMeasure = new UnitOfMeasure();
@@ -55,10 +59,11 @@ public class UnitOfMeasureControllerTest {
         unitOfMeasureDTO.setId(unitOfMeasure.getId());
         unitOfMeasureDTO.setName(unitOfMeasure.getName());
         units.add(unitOfMeasureDTO);
+        Page<UnitOfMeasureDTO> page = new PageImpl<>(units);
 
-        when(uomService.getUoMList()).thenReturn(units);
+        when(uomService.findAllUoms(any())).thenReturn(page);
 
-        mockMvc.perform(get("/api/units"))
+        mockMvc.perform(get("/api/units?page=0&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(unitOfMeasure.getName())));

@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,10 +72,10 @@ public class UserController {
      * @throws URISyntaxException if the User Location URI syntax is incorrect
      */
     @PostMapping("/user")
-    @Secured("ADMIN")
     public ResponseEntity createUser(@Valid @RequestBody UserVM userVM, HttpServletRequest request) throws URISyntaxException{
         log.debug("REST request to save new User: {}", userVM);
 
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         if (userVM.getId() != null){
             return ResponseEntity.badRequest()
                     .headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "User already have ID cannot be created."))

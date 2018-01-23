@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +56,10 @@ public class EvaluationServiceImplTest {
 
         when(evaluationRepository.findAll()).thenReturn(evaluations);
 
-        List<EvaluationDTO> evaluationDTOList = evaluationService.getEvaluations();
+        Page<EvaluationDTO> evaluationDTOList = evaluationService.getEvaluations(any());
 
         assertNotNull(evaluationDTOList);
-        assertEquals(1, evaluationDTOList.size());
+        assertEquals(1, evaluationDTOList.getTotalElements());
 
     }
 

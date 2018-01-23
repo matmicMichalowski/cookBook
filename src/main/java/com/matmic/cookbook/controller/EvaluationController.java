@@ -1,11 +1,17 @@
 package com.matmic.cookbook.controller;
 
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
+import com.matmic.cookbook.controller.util.PaginationUtil;
+import com.matmic.cookbook.domain.Evaluation;
 import com.matmic.cookbook.dto.EvaluationDTO;
+import com.matmic.cookbook.repository.EvaluationRepository;
 import com.matmic.cookbook.service.EvaluationService;
 import com.matmic.cookbook.service.RatingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * REST controller for managing Evaluation
@@ -26,22 +33,28 @@ public class EvaluationController {
     private static final String ENTITY_NAME = "evaluation";
 
     private final EvaluationService evaluationService;
+    private final EvaluationRepository evaluationRepository;
     private final RatingService ratingService;
 
-    public EvaluationController(EvaluationService evaluationService, RatingService ratingService) {
+
+    public EvaluationController(EvaluationService evaluationService, EvaluationRepository evaluationRepository, RatingService ratingService) {
         this.evaluationService = evaluationService;
+        this.evaluationRepository = evaluationRepository;
         this.ratingService = ratingService;
     }
 
     /**
      * GET /evaluations : get all evaluations
      *
-     * @return ResponseEntity with status 200 and with body list of evaluationDTO
+     * @param pageable pagination information
+     * @return ResponseEntity with status 200 OK and with body list of evaluationDTO
      */
     @GetMapping("/evaluations")
-    public ResponseEntity<List<EvaluationDTO>> getAllEvaluations(){
+    public ResponseEntity<List<EvaluationDTO>> getAllEvaluations(Pageable pageable){
         log.debug("REST request to get all evaluations");
-        return new ResponseEntity<>(evaluationService.getEvaluations(), HttpStatus.OK);
+        Page<EvaluationDTO> page = evaluationService.getEvaluations(pageable);
+        HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/evaluations");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
     /**
@@ -70,6 +83,11 @@ public class EvaluationController {
                     .body(null);
         }
         log.debug("REST request to add evaluation to recipe: {}", evaluationDTO);
+        Optional<Evaluation> isExisting = evaluationRepository.findByIdAndUserId(evaluationDTO.getRatingId(), evaluationDTO.getUserId());
+        if (isExisting.isPresent()){
+            return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "Evaluation exist you can only update it."))
+                    .body(null);
+        }
         EvaluationDTO savedEvaluation = evaluationService.saveNewEvaluation(evaluationDTO);
         ratingService.updateRating(savedEvaluation);
         return ResponseEntity.created(new URI("/api/evaluation/" + savedEvaluation.getId().toString()))

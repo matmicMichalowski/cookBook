@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +45,6 @@ public class UnitOfMeasureServiceImplTest {
         uom = new UnitOfMeasure();
         uom.setId(1L);
         uom.setName("UoM one");
-
-
     }
 
     @Test
@@ -54,10 +53,10 @@ public class UnitOfMeasureServiceImplTest {
         uomList.add(uom);
         when(uomRepository.findAll()).thenReturn(uomList);
 
-        List<UnitOfMeasureDTO> unitsFound = unitOfMeasureService.getUoMList();
+        Page<UnitOfMeasureDTO> unitsFound = unitOfMeasureService.findAllUoms(any());
 
         assertNotNull(unitsFound);
-        assertEquals(1, unitsFound.size());
+        assertEquals(1, unitsFound.getTotalElements());
         verify(uomRepository, times(1)).findAll();
     }
 

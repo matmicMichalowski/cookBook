@@ -9,6 +9,8 @@ import com.matmic.cookbook.repository.EvaluationRepository;
 import com.matmic.cookbook.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,15 +43,14 @@ public class EvaluationServiceImpl implements EvaluationService {
     /**
      * Get all evaluations
      *
+     * @param pageable pagination information
      * @return list of all evaluations
      */
     @Override
     @Transactional(readOnly = true)
-    public List<EvaluationDTO> getEvaluations() {
+    public Page<EvaluationDTO> getEvaluations(Pageable pageable) {
         log.debug("Request to get all Evaluations");
-        return evaluationRepository.findAll().stream()
-                .map(toEvaluationDto::convert)
-                .collect(Collectors.toList());
+        return evaluationRepository.findAll(pageable).map(toEvaluationDto::convert);
     }
 
     /**

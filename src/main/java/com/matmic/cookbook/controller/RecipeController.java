@@ -6,6 +6,8 @@ import com.matmic.cookbook.dto.IngredientDTO;
 import com.matmic.cookbook.dto.RecipeDTO;
 import com.matmic.cookbook.service.IngredientService;
 import com.matmic.cookbook.service.RecipeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +23,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api")
 public class RecipeController {
+
+    private Logger log = LoggerFactory.getLogger(RecipeController.class);
 
     public static final String ENTITY_NAME = "recipe";
 
@@ -40,6 +44,7 @@ public class RecipeController {
      */
     @GetMapping("/recipes")
     public ResponseEntity<List<RecipeDTO>> getAllRecipes(Pageable pageable){
+        log.debug("REST request to get all recipes");
         Page<RecipeDTO> page = recipeService.findAllRecipes(pageable);
         HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/recipes");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -53,6 +58,7 @@ public class RecipeController {
      */
     @GetMapping("/recipe/{id}")
     public ResponseEntity<RecipeDTO> getRecipeById(@PathVariable Long id){
+        log.debug("REST request to get recipe by id: {}", id);
         return new ResponseEntity<>(recipeService.findRecipeById(id), HttpStatus.OK);
     }
 
@@ -64,6 +70,7 @@ public class RecipeController {
      */
     @GetMapping("/recipes/above/{aboveValue}")
         public ResponseEntity<List<RecipeDTO>> getRecipesAboveRating(@PathVariable int aboveValue){
+            log.debug("REST request to get recipes above rating value: {}", aboveValue);
             return new ResponseEntity<>(recipeService.findRecipeByRatingAboveValue(aboveValue), HttpStatus.OK);
         }
 
@@ -76,6 +83,7 @@ public class RecipeController {
      */
     @GetMapping("/recipes/above/{aboveValue}/below/{belowValue}")
     public ResponseEntity<List<RecipeDTO>> getRecipesInRatingRange(@PathVariable int aboveValue, @PathVariable int belowValue){
+        log.debug("REST request to get recipes between two value ratings: {}, {}", aboveValue, belowValue);
         return new ResponseEntity<>(recipeService.findRecipeByRatingValueBetweenLowAndHigh(aboveValue, belowValue), HttpStatus.OK);
     }
 
@@ -88,6 +96,7 @@ public class RecipeController {
      */
     @GetMapping("/recipes/below/{belowValue}")
     public ResponseEntity<List<RecipeDTO>> getRecipesBelowRating(@PathVariable int belowValue){
+        log.debug("REST request to get recipes above rating value: {}", belowValue);
         return new ResponseEntity<>(recipeService.findRecipeByRatingBelowValue(belowValue), HttpStatus.OK);
     }
 
@@ -99,6 +108,7 @@ public class RecipeController {
      */
     @GetMapping("/recipes/{categoryName}")
     public ResponseEntity<List<RecipeDTO>> getRecipesByCategory(@PathVariable String categoryName){
+        log.debug("REST request to get recipes by category name: {}", categoryName);
         return new ResponseEntity<>(recipeService.findRecipeByCategory(categoryName), HttpStatus.OK);
     }
 
@@ -110,6 +120,7 @@ public class RecipeController {
      */
     @GetMapping("/recipe/{id}/ingredients")
     public ResponseEntity<Set<IngredientDTO>> getIngredientsFromRecipe(@PathVariable Long id){
+        log.debug("REST request to get ingredients from recipe: {}", id);
         return new ResponseEntity<>(ingredientService.getAllIngredientsFromRecipe(id), HttpStatus.OK);
     }
 
@@ -122,6 +133,7 @@ public class RecipeController {
      */
     @GetMapping("/recipe/{id}/ingredient/{ingredientId}")
     public ResponseEntity<IngredientDTO> findIngredientInRecipe(@PathVariable Long id, @PathVariable Long ingredientId){
+        log.debug("REST request to get single ingredient from recipe: {}, {}", id, ingredientId);
         return new ResponseEntity<>(ingredientService.findByRecipeIdAndIngredientId(id, ingredientId), HttpStatus.OK);
     }
 
@@ -136,6 +148,7 @@ public class RecipeController {
      */
     @PostMapping("user/{userId}/recipe")
     public ResponseEntity<RecipeDTO> createRecipe(@RequestBody RecipeDTO recipeDTO, @PathVariable Long userId) throws URISyntaxException{
+        log.debug("REST request to create recipe: {}", recipeDTO);
         if (recipeDTO.getId() != null){
             return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "A new recipe cannot be created, it have already ID")).body(null);
         }
@@ -156,6 +169,7 @@ public class RecipeController {
      */
     @PutMapping("/user/{userId}/recipe")
     public ResponseEntity<RecipeDTO> updateRecipe(@RequestBody RecipeDTO recipeDTO, @PathVariable Long userId) throws URISyntaxException{
+        log.debug("REST request to update recipe: {}", recipeDTO);
         if (recipeDTO.getId() == null){
             return createRecipe(recipeDTO, userId);
         }
@@ -172,6 +186,7 @@ public class RecipeController {
      */
     @DeleteMapping("/recipe/{id}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable Long id){
+        log.debug("REST request to delete recipe: {}", id);
         recipeService.deleteRecipe(id);
         return ResponseEntity.ok().headers(HttpHeadersUtil.deleteEntityAlert(ENTITY_NAME, id.toString())).build();
     }

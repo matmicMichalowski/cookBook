@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
-@Entity
+@Entity(name = "comment")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,5 +39,47 @@ public class Comment implements Serializable {
     @NotNull
     @JsonBackReference
     private Recipe recipe;
+
+    public void setUser(User user){
+
+        if(sameAsFormerUser(user)){
+            return;
+        }
+
+        User actualUser = this.user;
+        this.user = user;
+
+        if(actualUser != null){
+            actualUser.getComments().remove(this);
+        }
+        if(user != null){
+            user.getComments().add(this);
+        }
+    }
+
+    private boolean sameAsFormerUser(User newUser){
+        return user == null ? newUser == null : user.equals(newUser);
+    }
+
+    public void setRecipe(Recipe recipe){
+
+        if(sameAsFormerRecipe(recipe)){
+            return;
+        }
+
+        Recipe actualRecipe = this.recipe;
+        this.recipe = recipe;
+
+        if(actualRecipe != null){
+            actualRecipe.getComments().remove(this);
+        }
+        if(recipe != null){
+            recipe.getComments().add(this);
+        }
+    }
+
+    private boolean sameAsFormerRecipe(Recipe newRecipe){
+        return recipe == null ? newRecipe == null : recipe.equals(newRecipe);
+    }
 
 }

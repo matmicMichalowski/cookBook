@@ -7,11 +7,10 @@ import com.matmic.cookbook.dto.UnitOfMeasureDTO;
 import com.matmic.cookbook.repository.UnitOfMeasureRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing UnitOfMeasure
@@ -37,15 +36,14 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     /**
      * Get all unit of measure
      *
+     * @param pageable pagination information
      * @return list of all entities
      */
     @Override
     @Transactional(readOnly = true)
-    public List<UnitOfMeasureDTO> getUoMList() {
+    public Page<UnitOfMeasureDTO> findAllUoms(Pageable pageable) {
         log.debug("Request to get all Units of Measure");
-        return uomRepository.findAll().stream()
-                .map(toUnitOfMeasureDto::convert)
-                .collect(Collectors.toList());
+        return uomRepository.findAll(pageable).map(toUnitOfMeasureDto::convert);
     }
 
     /**

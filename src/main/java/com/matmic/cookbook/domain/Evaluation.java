@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "evaluation")
 public class Evaluation implements Serializable {
 
     private static final long serialVersionUID = 1L;

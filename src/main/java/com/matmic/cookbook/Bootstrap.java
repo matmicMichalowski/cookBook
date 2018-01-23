@@ -1,7 +1,9 @@
 package com.matmic.cookbook;
 
 import com.matmic.cookbook.converter.CategoryDtoToCategory;
-import com.matmic.cookbook.domain.*;
+import com.matmic.cookbook.domain.Authority;
+import com.matmic.cookbook.domain.Category;
+import com.matmic.cookbook.domain.UnitOfMeasure;
 import com.matmic.cookbook.dto.CategoryDTO;
 import com.matmic.cookbook.repository.*;
 import com.matmic.cookbook.security.AuthoritiesConstants;
@@ -62,52 +64,53 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent>{
             unit = optional.get();
         }
 
-        User user = new User();
-        user.setName("UserTest");
-        user.setEmail("mail@test.com");
-        user.setPassword("pass");
-
-
-        userRepository.save(user);
+//        User user = new User();
+//        user.setName("UserTest");
+//        user.setEmail("mail@test.com");
+//        user.setPassword("pass");
+//
+//
+//        userRepository.save(user);
 
         Category cat1 = new Category();
         cat1.setName("European");
 
         categoryRepository.save(cat1);
 
-        Recipe recipe = new Recipe();
-        //recipe.setId(2L);
-        recipe.getCategories().add(cat1);
-        Rating rating = new Rating();
-        rating.setRecipe(recipe);
-        rating.setTotalRating(5.0);
-        recipe.setRating(rating);
-        recipe.setUser(user);
-        recipe.setDirections("New directions");
-        recipe.setDifficulty(Difficulty.EASY);
-        recipe.setName("Rice meal");
-        recipe.setUserName(user.getName());
-        user.getRecipes().add(recipe);
-
-        Ingredient ingredient = new Ingredient();
-        //ingredient.setId(2L);
-        ingredient.setUnitOfMeasure(unit);
-        ingredient.setRecipe(recipe);
-        ingredient.setName("Pepper");
-        ingredient.setAmount(1);
-
-        recipe.getIngredients().add(ingredient);
-
-        recipeRepository.save(recipe);
-
-        Comment comment = new Comment();
-        comment.setUser(user);
-        comment.getUser().getComments().add(comment);
-        comment.setRecipe(recipe);
-        comment.getRecipe().getComments().add(comment);
-        comment.setUserName("Jhonatan");
-        comment.setComment("Test Comment");
-        commentRepository.saveAndFlush(comment);
+//        Recipe recipe = new Recipe();
+//        //recipe.setId(2L);
+//        recipe.getCategories().add(cat1);
+//        Rating rating = new Rating();
+//        rating.setRecipe(recipe);
+//        rating.setTotalRating(5.0);
+//        recipe.setRating(rating);
+//        recipe.setServings(2);
+//        recipe.setUser(user);
+//        recipe.setDirections("New directions");
+//        recipe.setDifficulty(Difficulty.EASY);
+//        recipe.setName("Rice meal");
+//        recipe.setUserName(user.getName());
+//        user.getRecipes().add(recipe);
+//
+//        Ingredient ingredient = new Ingredient();
+//        //ingredient.setId(2L);
+//        ingredient.setUnitOfMeasure(unit);
+//        ingredient.setRecipe(recipe);
+//        ingredient.setName("Pepper");
+//        ingredient.setAmount(1);
+//
+//        recipe.getIngredients().add(ingredient);
+//
+//        recipeRepository.save(recipe);
+//
+//        Comment comment = new Comment();
+//        comment.setUser(user);
+//        comment.getUser().getComments().add(comment);
+//        comment.setRecipe(recipe);
+//        comment.getRecipe().getComments().add(comment);
+//        comment.setUserName("Jhonatan");
+//        comment.setComment("Test Comment");
+//        commentRepository.saveAndFlush(comment);
 
     }
 
