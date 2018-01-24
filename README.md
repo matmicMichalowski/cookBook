@@ -39,15 +39,19 @@ Main activities that are managed:
 Here is some of what this project cover:
 
 * MVC and DTO patterns
-* Integration with JPA/Hibernate
+* Integration with **JPA/Hibernate**
 * Pagination handling
 * Data validation
 * Activation account/Reset password via email
 * Brute force authentication attempts prevention
-* Use of Project Lombok
-* Mockito and JUnit tests
-* API documented by Swagger2
+* Use of Project **Lombok**
+* **Mockito and JUnit** tests
+* API documented by **Swagger2**
 
 ## To preview all endpoints in Swagger 2 API docs
 
 Run server and browse to ```localhost:8080/v2/api-docs```
+
+## To preview endpoints in Swagger UI view
+
+Run server and browse to ```localhost:8080/swagger-ui.html```

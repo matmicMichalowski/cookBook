@@ -1,6 +1,7 @@
 package com.matmic.cookbook.controller.viewmodel;
 
 import com.matmic.cookbook.dto.UserDTO;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -13,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserVM extends UserDTO{
 
+    @ApiModelProperty(required = true)
     @Size(min = 5, max = 100)
     private String password;
 

@@ -9,6 +9,9 @@ import com.matmic.cookbook.security.SecurityUtil;
 import com.matmic.cookbook.service.EmailService;
 import com.matmic.cookbook.service.UserService;
 import com.matmic.cookbook.service.mail.Mail;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -49,6 +52,11 @@ public class UserAccountController {
      * @return ResponseEntity with status 201 Created if the user is registered 400 BadRequest if the login or email
      * is in use
      */
+    @ApiOperation(value = "Register new User")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successfully created user."),
+            @ApiResponse(code = 400, message = "Email or Username is in use.")
+    })
     @PostMapping(path = "/register", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity registerNewUserAccount(@Valid @RequestBody UserVM userVM, HttpServletRequest request){
         String applicationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -133,7 +141,8 @@ public class UserAccountController {
      * or status 400 Bad Request if new email is in use,
      * or 500 Internal Server Error if the user could not be updated
      */
-    @PostMapping("/account")
+    @ApiResponse(code = 200, message = "Updated")
+    @PutMapping("/account")
     public ResponseEntity updateAndSaveAccount(@Valid @RequestBody UserDTO userDTO){
         log.debug("REST request to update userDTO : {}", userDTO);
         final String userLogin = SecurityUtil.getCurrentUser();

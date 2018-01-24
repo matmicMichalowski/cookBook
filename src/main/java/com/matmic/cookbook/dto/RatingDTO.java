@@ -1,5 +1,6 @@
 package com.matmic.cookbook.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +17,7 @@ public class RatingDTO {
     private int evaluationSum;
     private String totalRating;
     private Set<EvaluationDTO> usersEvaluations = new HashSet<>();
+
+    @ApiModelProperty(required = true)
     private Long recipeId;
 }

@@ -1,5 +1,6 @@
 package com.matmic.cookbook.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,17 +16,20 @@ public class CommentDTO {
 
     private Long id;
 
+    @ApiModelProperty(required = true)
     @Size(min = 5, max = 500)
     private String comment;
 
-
+    @ApiModelProperty(required = true)
     private String userName;
 
     @NotNull
     @Min(1)
+    @ApiModelProperty(required = true)
     private Long userId;
 
     @NotNull
     @Min(1)
+    @ApiModelProperty(required = true)
     private Long recipeId;
 }

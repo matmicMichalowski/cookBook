@@ -1,6 +1,7 @@
 package com.matmic.cookbook.dto;
 
 import com.matmic.cookbook.domain.User;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,8 +15,13 @@ import java.util.Set;
 public class UserDTO {
 
     private Long id;
+
+    @ApiModelProperty(required = true)
     private String name;
+
+    @ApiModelProperty(required = true)
     private String email;
+
     private boolean isActive = false;
     private Set<String> authorities = new HashSet<>();
     private Set<RecipeDTO> recipes = new HashSet<>();
