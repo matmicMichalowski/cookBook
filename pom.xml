@@ -5,7 +5,7 @@
 
 	<groupId>com.matmic</groupId>
 	<artifactId>cookbook</artifactId>
-	<version>1.0</version>
+	<version>v1</version>
 	<packaging>jar</packaging>
 
 	<name>cookbook</name>
@@ -26,10 +26,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
