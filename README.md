@@ -2,14 +2,34 @@
 CookBook REST API.
 This project was made to learn building REST API.
 
-## Technology stack:
+## About Service
 
-  * Java 8
-  * SpringBoot 2.0.0 M7
-  * JPA/Hibernate
-  * Maven 3.5
-  * Thymeleaf 3.0
-  * Mockito, JUnit
+This is REST service enabling posting and evaluating cooking recipes. To post a recipe or comment, user must register and authenticate.
+User can hold role of 'ADMIN' or 'USER'. Admin is allowed to update recipes and comments of other users, also admin have possibility
+to create new users with 'ADMIN' role. Authenticated user is allowed to create new recipes, add comments and evaluate recipes. 
+Unauthenticated user can only browse recipes.
+
+
+##### Here is some of what this project cover:
+
+* MVC and DTO patterns
+* CRUD operations
+* Pagination handling
+* Data validation
+* Activation account/Reset user password via email
+* Brute force authentication attempts prevention
+* Use of Project **Lombok**
+
+
+## Technology stack:
+  * ***Java 8, SpringBoot 2.0.0 M7***  
+  
+  * **persistence**: Spring Data JPA/Hibernate
+  * **persistence provider**: H2, MySQL
+  * **security**: Spring Security
+  * **build**: Maven 3.5
+  * **documentation**: Swagger 2, Swagger UI
+  * **testing**: Mockito, JUnit
 
 
 ## How to run project:
@@ -19,34 +39,14 @@ This project was made to learn building REST API.
 * Once successfully built, you can run the service by one of these two methods:
 
 ```
-        java -jar target/cookbook-1.0.jar
+        java -jar target/cookbook-v1.jar
 or
         mvn cookbook:run
 ```
 
+## Datasource configuration
+By default project use H2 in-memory database. Access via ```localhost:8080/h2-console```. To switch on MySQL, uncomment MySQL configuration in ```application.properties``` file.
 
-## About Service
-
-This is REST service enabling posting and evaluating cooking recipes. To post a recipe or comment, user must register and authenticate.
-
-Main activities that are managed:
-
-  * Registration
-  * Creation and updating recipes
-  * Posting comments on recipes
-  * Evaluating recipes
-
-Here is some of what this project cover:
-
-* MVC and DTO patterns
-* Integration with **JPA/Hibernate**
-* Pagination handling
-* Data validation
-* Activation account/Reset password via email
-* Brute force authentication attempts prevention
-* Use of Project **Lombok**
-* **Mockito and JUnit** tests
-* API documented by **Swagger2**
 
 ## To preview all endpoints in Swagger 2 API docs
 
