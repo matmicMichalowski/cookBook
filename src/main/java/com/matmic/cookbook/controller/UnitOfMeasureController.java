@@ -4,8 +4,6 @@ import com.matmic.cookbook.controller.util.HttpHeadersUtil;
 import com.matmic.cookbook.controller.util.PaginationUtil;
 import com.matmic.cookbook.dto.UnitOfMeasureDTO;
 import com.matmic.cookbook.service.UnitOfMeasureService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +23,6 @@ import java.util.List;
 @RequestMapping("/api")
 public class UnitOfMeasureController {
 
-    private final Logger log = LoggerFactory.getLogger(UnitOfMeasureController.class);
 
     private static final String ENTITY_NAME = "UnitOfMeasure";
 
@@ -43,7 +40,6 @@ public class UnitOfMeasureController {
      */
     @GetMapping("/units")
     public ResponseEntity<List<UnitOfMeasureDTO>> getAllUnits(Pageable pageable){
-        log.debug("REST request to get all Units");
         Page<UnitOfMeasureDTO> page = uomService.getUomList(pageable);
         HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/units");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -61,7 +57,6 @@ public class UnitOfMeasureController {
     @Secured("ADMIN")
     public ResponseEntity<UnitOfMeasureDTO> createNewUnitOfMeasure(@RequestBody UnitOfMeasureDTO newUom)
             throws URISyntaxException{
-        log.debug("REST request to create and save new UnitOfMeasure entity");
         if (newUom.getId() != null){
             return ResponseEntity.badRequest().headers(HttpHeadersUtil
                     .createEntityFailureAlert(ENTITY_NAME, "New unit cannot be created, already have an ID"))
@@ -81,7 +76,6 @@ public class UnitOfMeasureController {
      */
     @GetMapping("/unit/by-id/{id}")
     public ResponseEntity<UnitOfMeasureDTO> getUnitById(@PathVariable Long id){
-        log.debug("REST request to get UnitOfMeasure by id: {}", id);
         return new ResponseEntity<>(uomService.findUnitById(id), HttpStatus.OK);
     }
 
@@ -94,7 +88,6 @@ public class UnitOfMeasureController {
      */
     @GetMapping("/unit/by-name/{name}")
     public ResponseEntity<UnitOfMeasureDTO> getUnitByName(@PathVariable String name){
-        log.debug("REST request to get UnitOfMeasure by name: {}", name);
         return new ResponseEntity<>(uomService.findUnitByName(name), HttpStatus.OK);
     }
 
@@ -107,7 +100,6 @@ public class UnitOfMeasureController {
     @DeleteMapping("/unit/{id}")
     @Secured("ADMIN")
     public ResponseEntity<Void> deleteUnitOfMeasureById(@PathVariable Long id){
-        log.debug("REST request to delete UnitOfMeasure by id: {}", id);
         uomService.deleteUnit(id);
         return ResponseEntity.ok().headers(HttpHeadersUtil.deleteEntityAlert(ENTITY_NAME, id.toString()))
                 .build();

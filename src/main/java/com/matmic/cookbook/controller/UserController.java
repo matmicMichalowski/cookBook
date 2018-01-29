@@ -10,8 +10,6 @@ import com.matmic.cookbook.repository.UserRepository;
 import com.matmic.cookbook.service.EmailService;
 import com.matmic.cookbook.service.UserService;
 import com.matmic.cookbook.service.mail.Mail;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -35,8 +33,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api")
 public class UserController {
-
-    private final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private static final String ENTITY_NAME = "user";
     private final UserService userService;
@@ -73,7 +69,6 @@ public class UserController {
      */
     @PostMapping("/user")
     public ResponseEntity createUser(@Valid @RequestBody UserVM userVM, HttpServletRequest request) throws URISyntaxException{
-        log.debug("REST request to save new User: {}", userVM);
 
         System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         if (userVM.getId() != null){
@@ -106,7 +101,6 @@ public class UserController {
      */
     @PutMapping("/user")
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO){
-        log.debug("REST request to update User: {}", userDTO);
         Optional<User> isExisting = userRepository.findOneByEmail(userDTO.getEmail());
         if (isExisting.isPresent() && (!isExisting.get().getId().equals(userDTO.getId()))){
             return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "Email is in use"))
@@ -130,7 +124,6 @@ public class UserController {
      */
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers(Pageable pageable){
-        log.debug("REST request for all Users");
         Page<UserDTO> page  = userService.findAllUsers(pageable);
         HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/users");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -144,7 +137,6 @@ public class UserController {
      */
     @GetMapping("/user/{id}/recipes")
     public ResponseEntity<List<RecipeDTO>> findUserRecipes(@PathVariable String id){
-        log.debug("REST request to get user recipe list : {}", id);
         return new ResponseEntity<>(userService.findUserRecipes(Long.valueOf(id)), HttpStatus.OK);
     }
 
@@ -156,7 +148,6 @@ public class UserController {
      */
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable Long id){
-        log.debug("REST request to get User: {}", id);
         return ResponseEntity.ok(userService.findUserDTOByID(id));
     }
 
@@ -179,9 +170,7 @@ public class UserController {
      * @return ResponseEntity with status 200 OK
      */
     @DeleteMapping("/user/{id}")
-    //@Secured("ADMIN")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        log.debug("REST request to delete User: {}", id);
         userService.deleteUser(id);
         return ResponseEntity.ok().headers(HttpHeadersUtil.deleteEntityAlert(ENTITY_NAME, id.toString())).build();
     }

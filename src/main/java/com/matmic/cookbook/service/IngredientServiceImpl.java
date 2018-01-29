@@ -7,8 +7,6 @@ import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.dto.IngredientDTO;
 import com.matmic.cookbook.repository.RecipeRepository;
 import com.matmic.cookbook.repository.UnitOfMeasureRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class IngredientServiceImpl implements IngredientService {
 
-    private final Logger log = LoggerFactory.getLogger(IngredientServiceImpl.class);
 
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
@@ -46,7 +43,6 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     @Transactional(readOnly = true)
     public Set<IngredientDTO> getAllIngredientsFromRecipe(Long recipeId){
-        log.debug("Request to get all ingredients from Recipe: {}", recipeId);
         Optional<Recipe> recipeOptional =  recipeRepository.findById(recipeId);
         if (recipeOptional.isPresent()){
             Recipe recipeFound = recipeOptional.get();
@@ -67,7 +63,6 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     @Transactional(readOnly = true)
     public IngredientDTO findByRecipeIdAndIngredientId(Long recipeId, Long id){
-        log.debug("Request to get one Ingredient with id: {}, from Recipe: {}", id, recipeId);
         Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
         if (recipeOptional.isPresent()){
             Recipe recipeFound = recipeOptional.get();
@@ -88,7 +83,6 @@ public class IngredientServiceImpl implements IngredientService {
      */
     @Override
     public IngredientDTO saveOrUpdateIngredient(IngredientDTO ingredientDTO) {
-        log.debug("Request to save Inrgedient entity: {}", ingredientDTO);
         Optional<Recipe> optional = recipeRepository.findById(ingredientDTO.getRecipeId());
 
         if(!optional.isPresent()){
@@ -138,7 +132,6 @@ public class IngredientServiceImpl implements IngredientService {
      */
     @Override
     public void deleteIngredient(Long recipeId, Long id) {
-        log.debug("Request to delete Ingredient with id: {}, from Recipe: {}", id, recipeId);
         Optional<Recipe> optional = recipeRepository.findById(recipeId);
 
         if (optional.isPresent()){

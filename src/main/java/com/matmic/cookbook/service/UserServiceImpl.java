@@ -189,7 +189,6 @@ public class UserServiceImpl implements UserService {
         user.setAuthorities(authorities);
         user.setActivationToken(UUID.randomUUID().toString());
         userRepository.saveAndFlush(user);
-        log.debug("Created new user: {}", user);
         return user;
     }
 

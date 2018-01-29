@@ -7,8 +7,6 @@ import com.matmic.cookbook.dto.EvaluationDTO;
 import com.matmic.cookbook.repository.EvaluationRepository;
 import com.matmic.cookbook.service.EvaluationService;
 import com.matmic.cookbook.service.RatingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +26,6 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class EvaluationController {
 
-    private final Logger log = LoggerFactory.getLogger(EvaluationController.class);
 
     private static final String ENTITY_NAME = "evaluation";
 
@@ -51,7 +48,6 @@ public class EvaluationController {
      */
     @GetMapping("/evaluations")
     public ResponseEntity<List<EvaluationDTO>> getAllEvaluations(Pageable pageable){
-        log.debug("REST request to get all evaluations");
         Page<EvaluationDTO> page = evaluationService.getEvaluations(pageable);
         HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/evaluations");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -65,7 +61,6 @@ public class EvaluationController {
      */
     @GetMapping("/evaluation/{id}")
     public ResponseEntity<EvaluationDTO> getEvaluationById(@PathVariable Long id){
-        log.debug("REST request to get single evaluation by id: {}", id);
         EvaluationDTO evaluationDTO = evaluationService.findEvaluationById(id);
         return new ResponseEntity<>(evaluationDTO, HttpStatus.OK);
     }
@@ -82,7 +77,6 @@ public class EvaluationController {
             return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "New evaluation can not be created, already has an id"))
                     .body(null);
         }
-        log.debug("REST request to add evaluation to recipe: {}", evaluationDTO);
         Optional<Evaluation> isExisting = evaluationRepository.findByIdAndUserId(evaluationDTO.getRatingId(), evaluationDTO.getUserId());
         if (isExisting.isPresent()){
             return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "Evaluation exist you can only update it."))
@@ -105,7 +99,6 @@ public class EvaluationController {
      */
     @PutMapping("/evaluation")
     public ResponseEntity<EvaluationDTO> updateEvaluation(@RequestBody EvaluationDTO evaluationDTO) throws URISyntaxException{
-        log.debug("REST request to update evaluation: {}", evaluationDTO);
         if (evaluationDTO.getId() == null){
             return saveNewEvaluation(evaluationDTO);
         }
@@ -131,7 +124,6 @@ public class EvaluationController {
      */
     @GetMapping("/evaluation/user/{userId}")
     public ResponseEntity<List<EvaluationDTO>> getEvaluationsByUser(@PathVariable Long userId){
-        log.debug("REST request to get user evaluations: {}", userId);
         return new ResponseEntity<>(evaluationService.evaluationsByUser(userId), HttpStatus.OK);
     }
 }

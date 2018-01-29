@@ -7,8 +7,6 @@ import com.matmic.cookbook.domain.Rating;
 import com.matmic.cookbook.dto.EvaluationDTO;
 import com.matmic.cookbook.dto.RatingDTO;
 import com.matmic.cookbook.repository.RatingRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +20,6 @@ import java.util.Set;
 @Transactional
 public class RatingServiceImpl implements RatingService {
 
-    private final Logger log = LoggerFactory.getLogger(RatingServiceImpl.class);
 
     private final EvaluationDtoToEvaluation toEvaluation;
     private final RatingToRatingDto toRatingDto;
@@ -43,7 +40,6 @@ public class RatingServiceImpl implements RatingService {
      */
     @Override
     public RatingDTO updateRating(EvaluationDTO evaluationDTO) {
-        log.debug("Request to update Rating with Evaluation: {}", evaluationDTO);
         Optional<Rating> optional = ratingRepository.findById(evaluationDTO.getRatingId());
 
         if (!optional.isPresent()){
@@ -84,7 +80,6 @@ public class RatingServiceImpl implements RatingService {
     @Override
     @Transactional(readOnly = true)
     public Set<EvaluationDTO> findRatingEvaluations(Long ratingId){
-        log.debug("Request for evaluations in Rating: {}", ratingId);
         return findRatingByRecipe(ratingId).getUsersEvaluations();
     }
 
@@ -97,7 +92,6 @@ public class RatingServiceImpl implements RatingService {
     @Override
     @Transactional(readOnly = true)
     public RatingDTO findRatingByRecipe(Long recipeId) {
-        log.debug("Request to get Rating from Recipe: {}", recipeId);
         Optional<Rating> optional = ratingRepository.findById(recipeId);
 
         if (optional.isPresent()){

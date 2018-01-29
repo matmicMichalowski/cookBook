@@ -75,13 +75,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
-//        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable().headers()
-//        .frameOptions().disable();
+
 
         http
                 .csrf().disable()
-//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//       .and()
              .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
              .exceptionHandling()
              .authenticationEntryPoint(unauthorizedEntryPointHttp401())

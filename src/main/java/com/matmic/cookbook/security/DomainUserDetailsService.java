@@ -49,7 +49,6 @@ public class DomainUserDetailsService implements UserDetailsService {
             throw new LockedException("blocked");
         }
 
-        //String lowercaseUsername = userLogin.toLowerCase();
         Optional<User> findUser = userRepository.findOneWithAuthoritiesByName(userLogin);
         return findUser.map(user -> {
             if(!user.isActive()){

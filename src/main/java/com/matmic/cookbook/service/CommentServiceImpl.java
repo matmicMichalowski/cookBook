@@ -9,8 +9,6 @@ import com.matmic.cookbook.dto.CommentDTO;
 import com.matmic.cookbook.repository.CommentRepository;
 import com.matmic.cookbook.repository.RecipeRepository;
 import com.matmic.cookbook.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class CommentServiceImpl implements CommentService {
 
-    private final Logger log = LoggerFactory.getLogger(CommentServiceImpl.class);
 
     private final CommentRepository commentRepository;
     private final CommentToCommentDto toCommentDto;
@@ -55,7 +52,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public Page<CommentDTO> getAllComments(Pageable pageable) {
-        log.debug("Request to get all Comments");
         return commentRepository.findAll(pageable).map(toCommentDto::convert);
     }
 
@@ -68,7 +64,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public CommentDTO findCommentById(Long id) {
-        log.debug("Request to get Comment by id: {}", id);
         Optional<Comment> optional = commentRepository.findById(id);
         if(optional.isPresent()){
             return toCommentDto.convert(optional.get());
@@ -86,7 +81,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public CommentDTO findUserCommentById(Long userId, Long commentId){
-        log.debug("Request to get Comment by id: {} and User Id: {}", commentId, userId);
         return findCommentsByUser(userId).stream()
                 .filter(comment -> comment.getId().equals(commentId))
                 .findFirst().orElseThrow(NullPointerException::new);
@@ -101,7 +95,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<CommentDTO> findCommentsByUser(Long userId) {
-        log.debug("Request to get all User comments: {}", userId);
         return  commentRepository.findCommentsByUserId(userId)
                 .stream()
                 .map(toCommentDto::convert)
@@ -117,7 +110,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<CommentDTO> findCommentByRecipe(Long recipeId) {
-        log.debug("Request to get all comments from Recipe: {}", recipeId);
         return commentRepository.findCommentsByRecipeId(recipeId)
                 .stream()
                 .map(toCommentDto::convert)
@@ -156,7 +148,6 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public CommentDTO saveOrUpdateComment(CommentDTO commentDTO) {
-        log.debug("Request to save Comment: {}", commentDTO);
         Comment commentToSave = toComment.convert(commentDTO);
         Comment saved = commentRepository.save(commentToSave);
         return toCommentDto.convert(saved);

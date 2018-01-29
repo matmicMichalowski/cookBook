@@ -102,7 +102,6 @@ public class UserAccountController {
      */
     @GetMapping("/activate")
     public ResponseEntity<String> userAccountActivation(@RequestParam("token") String activationToken){
-        log.debug("REST request to activate user account with token: {}", activationToken);
         return userService.activateUser(activationToken)
                 .map(user -> new ResponseEntity<String>(HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
@@ -116,7 +115,6 @@ public class UserAccountController {
      */
     @GetMapping("/account")
     public ResponseEntity<UserDTO> getAccount(){
-        log.debug("REST request to get actual user");
         return Optional.ofNullable(userService.getUserWithAuthorities()).map(user -> new ResponseEntity<>(new UserDTO(user), HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
@@ -129,7 +127,6 @@ public class UserAccountController {
      */
     @GetMapping("/authenticate")
     public String isAuthenticated(HttpServletRequest request){
-        log.debug("REST request to check if current user is authenticated");
         return request.getRemoteUser();
     }
 
@@ -144,7 +141,6 @@ public class UserAccountController {
     @ApiResponse(code = 200, message = "Updated")
     @PutMapping("/account")
     public ResponseEntity updateAndSaveAccount(@Valid @RequestBody UserDTO userDTO){
-        log.debug("REST request to update userDTO : {}", userDTO);
         final String userLogin = SecurityUtil.getCurrentUser();
         Optional<User> checkIfExists = userRepository.findOneByEmail(userDTO.getEmail());
         if (checkIfExists.isPresent() && (!checkIfExists.get().getName().equalsIgnoreCase(userLogin))){
@@ -168,7 +164,6 @@ public class UserAccountController {
      */
     @PostMapping(path = "/account/change-password", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity changePassword(@RequestBody String password){
-        log.debug("REST request to change password");
         if (!checkPasswordLen(password)){
             return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
         }
@@ -185,7 +180,6 @@ public class UserAccountController {
      */
     @PostMapping(path = "/account/reset-password/request", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity resetPasswordRequest(@RequestBody String email, HttpServletRequest request){
-        log.debug("REST request to initialize reset password: {}", email);
         return userService.resetPasswordRequest(email)
                 .map(user -> {
                     String applicationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
@@ -207,7 +201,6 @@ public class UserAccountController {
      */
     @PostMapping(path = "/account/reset-password/complete")
     public ResponseEntity<String> finishPasswordResetRequest(@RequestParam("token") String resetToken, @RequestBody String password){
-        log.debug("REST request to finish reset password request");
         if (!checkPasswordLen((password))){
             return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
         }

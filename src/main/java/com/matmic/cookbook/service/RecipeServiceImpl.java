@@ -9,8 +9,6 @@ import com.matmic.cookbook.domain.Recipe;
 import com.matmic.cookbook.domain.User;
 import com.matmic.cookbook.dto.RecipeDTO;
 import com.matmic.cookbook.repository.RecipeRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class RecipeServiceImpl implements RecipeService {
 
-    private final Logger log = LoggerFactory.getLogger(RecipeServiceImpl.class);
 
     private final RecipeRepository recipeRepository;
     private final RecipeToRecipeDto toRecipeDto;
@@ -57,7 +54,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     @Transactional(readOnly = true)
     public Page<RecipeDTO> findAllRecipes(Pageable pageable) {
-        log.debug("Request to get all Recipes");
         return recipeRepository.findAll(pageable).map(toRecipeDto::convert);
     }
 
@@ -70,12 +66,10 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     @Transactional(readOnly = true)
     public RecipeDTO findRecipeById(Long id) {
-        log.debug("Request to get Recipe: {}", id);
         Optional<Recipe> optional = recipeRepository.findById(id);
         if(optional.isPresent()){
             return toRecipeDto.convert(optional.get());
         }
-        log.debug("No Recipe with id: {}", id);
         return null;
     }
 
@@ -88,7 +82,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByCategory(String categoryName) {
-        log.debug("Request to get all Recipes with given category: {}", categoryName);
         return recipeRepository.findAllByCategoryName(categoryName.toLowerCase()).stream()
                 .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
@@ -104,7 +97,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByRatingValueBetweenLowAndHigh(int low, int high) {
-        log.debug("Request to get all Recipes within rating value range: {}, {}", low, high);
         return recipeRepository.findAllRecipesBetweenRatingValues(low, high).stream()
                 .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
@@ -119,7 +111,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByRatingAboveValue(int aboveValue) {
-        log.debug("Request to get all Recipes with rating above: {}", aboveValue);
         return recipeRepository.findAllRecipesAboveRating(aboveValue).stream()
                 .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
@@ -134,7 +125,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipeByRatingBelowValue(int belowValue) {
-        log.debug("Request to get all Recipes with rating below: {}", belowValue);
         return recipeRepository.findAllRecipesBelowRating(belowValue).stream()
                 .map(toRecipeDto::convert)
                 .collect(Collectors.toList());
@@ -149,7 +139,6 @@ public class RecipeServiceImpl implements RecipeService {
      */
     @Override
     public RecipeDTO createNewRecipe(RecipeDTO recipeDTO, Long userId){
-        log.debug("Request to create and save new Recipe: {}", recipeDTO);
         User user = userService.findUserByID(userId);
         if ( user == null){
             return null;
@@ -188,7 +177,6 @@ public class RecipeServiceImpl implements RecipeService {
      */
     @Override
     public RecipeDTO saveAndUpdateRecipe(RecipeDTO recipeDTO) {
-        log.debug("Request to update and save Recipe: {}", recipeDTO);
         Recipe detachedRecipe = toRecipe.convert(recipeDTO);
         Optional<Recipe> optional = recipeRepository.findById(recipeDTO.getId());
 
@@ -211,7 +199,6 @@ public class RecipeServiceImpl implements RecipeService {
      */
     @Override
     public void deleteRecipe(Long id) {
-        log.debug("Request to delete Recipe: {}", id);
         Optional<Recipe> optional = recipeRepository.findById(id);
 
         if (optional.isPresent()){

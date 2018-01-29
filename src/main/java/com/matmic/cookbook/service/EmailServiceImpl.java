@@ -65,7 +65,6 @@ public class EmailServiceImpl implements EmailService {
             helper.setFrom(FROM);
 
             mailSender.send(message);
-            log.debug("Email has been sent to: {}", mail.getMailTo());
 
         }catch(MessagingException ex){
             log.warn("Unable to send email {}", ex.getMessage());

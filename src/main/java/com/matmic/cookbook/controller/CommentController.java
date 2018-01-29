@@ -3,10 +3,10 @@ package com.matmic.cookbook.controller;
 import com.matmic.cookbook.controller.util.HttpHeadersUtil;
 import com.matmic.cookbook.controller.util.PaginationUtil;
 import com.matmic.cookbook.dto.CommentDTO;
+import com.matmic.cookbook.security.AuthoritiesConstants;
+import com.matmic.cookbook.security.SecurityUtil;
 import com.matmic.cookbook.service.CommentService;
 import com.matmic.cookbook.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +28,6 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class CommentController {
 
-    private final Logger log = LoggerFactory.getLogger(CommentController.class);
 
     public static final String ENTITY_NAME = "comment";
     private final CommentService commentService;
@@ -48,7 +47,6 @@ public class CommentController {
      */
     @GetMapping("/comment/{id}")
     public ResponseEntity<CommentDTO> getOneComment(@PathVariable Long id){
-        log.debug("REST request to get Comment by id: {}", id);
         CommentDTO comment = commentService.findCommentById(id);
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
@@ -61,7 +59,6 @@ public class CommentController {
      */
     @GetMapping("/comments")
     public ResponseEntity<List<CommentDTO>> getAllComments(Pageable pageable){
-        log.debug("REST request to get all comments");
         Page<CommentDTO> page = commentService.getAllComments(pageable);
         HttpHeaders headers = PaginationUtil.paginationHttpHeader(page, "/api/comments");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
@@ -102,14 +99,13 @@ public class CommentController {
      */
     @PutMapping("/comment/update")
     public ResponseEntity<CommentDTO> updateComment(@RequestBody CommentDTO commentDTO) throws URISyntaxException{
-        log.debug("REST request to update comment: {}", commentDTO);
         if (commentDTO.getId() == null){
             return createNewComment(commentDTO);
         }
 
         Authentication principal = SecurityContextHolder.getContext().getAuthentication();
         if (!commentDTO.getUserName().equals(principal.getName())){
-            if (!userService.checkIsAdmin(principal.getName())) {
+            if (!SecurityUtil.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
                 return ResponseEntity.badRequest().headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "User not allowed to edit this comment."))
                         .body(null);
             }

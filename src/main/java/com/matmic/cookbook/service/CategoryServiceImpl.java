@@ -5,8 +5,6 @@ import com.matmic.cookbook.converter.CategoryToCategoryDto;
 import com.matmic.cookbook.domain.Category;
 import com.matmic.cookbook.dto.CategoryDTO;
 import com.matmic.cookbook.repository.CategoryRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +19,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
 
-    private final Logger log = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     private final CategoryRepository categoryRepository;
     private final CategoryToCategoryDto toCategoryDto;
@@ -41,7 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoryDTO> findAll() {
-        log.debug("Request to get all Categories");
         return categoryRepository.findAll()
                 .stream()
                 .map(toCategoryDto::convert)
@@ -56,7 +52,6 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public CategoryDTO saveCategory(CategoryDTO categoryDTO) {
-        log.debug("Request to save Category: {}", categoryDTO);
         Category detachedCategory = toCategory.convert(categoryDTO);
         detachedCategory.setName(categoryDTO.getName().toLowerCase());
         Category savedCategory = categoryRepository.save(detachedCategory);
@@ -73,7 +68,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public Category findByName(String name){
-        log.debug("Request to get Category by name: {}", name);
         Optional<Category> categoryOptional = categoryRepository.findCategoryByName(name);
         if (categoryOptional.isPresent()){
             return categoryOptional.get();
@@ -90,7 +84,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public CategoryDTO findCategoryByName(String name) {
-        log.debug("Request to get CategoryDTO by name: {}", name);
         return toCategoryDto.convert(findByName(name));
     }
 
@@ -101,7 +94,6 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public void deleteCategory(Long id) {
-        log.debug("Request to delete Category: {}", id);
         categoryRepository.deleteById(id);
     }
 }

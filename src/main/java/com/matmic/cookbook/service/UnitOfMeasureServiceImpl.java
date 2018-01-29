@@ -5,8 +5,6 @@ import com.matmic.cookbook.converter.UnitOfMeasureToUnitOfMeasureDto;
 import com.matmic.cookbook.domain.UnitOfMeasure;
 import com.matmic.cookbook.dto.UnitOfMeasureDTO;
 import com.matmic.cookbook.repository.UnitOfMeasureRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
 
-    private final Logger log = LoggerFactory.getLogger(UnitOfMeasureServiceImpl.class);
 
     private final UnitOfMeasureRepository uomRepository;
     private final UnitOfMeasureDtoToUnitOfMeasure toUnitOfMeasure;
@@ -42,7 +39,6 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     @Override
     @Transactional(readOnly = true)
     public Page<UnitOfMeasureDTO> getUomList(Pageable pageable) {
-        log.debug("Request to get all Units of Measure");
         return uomRepository.findAll(pageable).map(toUnitOfMeasureDto::convert);
     }
 
@@ -54,7 +50,6 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
      */
     @Override
     public UnitOfMeasureDTO save(UnitOfMeasureDTO unitOfMeasureDTO) {
-        log.debug("Request to save UnitOfMeasure: {}", unitOfMeasureDTO);
         UnitOfMeasure unitToSave = toUnitOfMeasure.convert(unitOfMeasureDTO);
         UnitOfMeasure savedUnit = uomRepository.save(unitToSave);
         return toUnitOfMeasureDto.convert(savedUnit);
@@ -69,7 +64,6 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     @Override
     @Transactional(readOnly = true)
     public UnitOfMeasureDTO findUnitByName(String name) {
-        log.debug("Request to get one UnitOfMeasure by name: {}", name);
         return uomRepository.findUnitOfMeasureByName(name)
                 .map(toUnitOfMeasureDto::convert)
                 .orElseThrow(NullPointerException::new);
@@ -84,7 +78,6 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     @Override
     @Transactional(readOnly = true)
     public UnitOfMeasureDTO findUnitById(Long id) {
-        log.debug("Request to get one UnitOfMeasure by id: {}", id);
         return uomRepository.findById(id)
                 .map(toUnitOfMeasureDto::convert)
                 .orElseThrow(NullPointerException::new);
@@ -97,7 +90,6 @@ public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
      */
     @Override
     public void deleteUnit(Long id) {
-        log.debug("Request to delete UnitOfMeasure entity by id: {}", id);
         uomRepository.deleteById(id);
     }
 }
