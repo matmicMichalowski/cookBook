@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class UserAccountControllerTest {
@@ -138,7 +139,7 @@ public class UserAccountControllerTest {
         when(userRepository.findOneByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findUserByName(anyString())).thenReturn(Optional.of(user));
 
-        mockMvc.perform(post("/api/account")
+        mockMvc.perform(put("/api/account")
                     .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                     .content(TestUtil.asJsonBytes(userDTO)))
                 .andExpect(status().isOk());
