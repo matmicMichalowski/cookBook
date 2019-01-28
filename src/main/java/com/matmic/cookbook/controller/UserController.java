@@ -70,7 +70,7 @@ public class UserController {
     @PostMapping("/user")
     public ResponseEntity createUser(@Valid @RequestBody UserVM userVM, HttpServletRequest request) throws URISyntaxException{
 
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         if (userVM.getId() != null){
             return ResponseEntity.badRequest()
                     .headers(HttpHeadersUtil.createEntityFailureAlert(ENTITY_NAME, "User already have ID cannot be created."))
