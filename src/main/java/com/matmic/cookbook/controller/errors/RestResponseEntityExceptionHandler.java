@@ -1,6 +1,6 @@
 package com.matmic.cookbook.controller.errors;
 
-import org.springframework.boot.context.config.ResourceNotFoundException;
+import org.springframework.boot.context.properties.source.InvalidConfigurationPropertyValueException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +12,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler{
 
-    @ExceptionHandler({ResourceNotFoundException.class})
-    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex, WebRequest request){
+//    TODO wyszukać poprawny typ Exception, aktualnie podstawiony został mock excption, pożądany typ to odpowiednik usuniętego ResourceNotFoundException
+
+    @ExceptionHandler({InvalidConfigurationPropertyValueException.class})
+    public ResponseEntity<String> handleResourceNotFound(InvalidConfigurationPropertyValueException ex, WebRequest request){
         return new ResponseEntity<>("Resource Not Found", new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
